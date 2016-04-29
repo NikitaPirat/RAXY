@@ -1,0 +1,323 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8"/>
+	<title>RAXY</title>
+	<script src="js/GraphicObject.js" type="text/javascript"></script>
+	<script src="js/fabric.js-1.6.0-rc.1/dist/fabric.js" type="text/javascript"></script>
+	<link rel="stylesheet" href="ConstructorStyles.css" type="text/css"/>		
+		<!--<link rel="stylesheet" href="css/bootstrap.css" type="text/css"/>
+		<link rel="stylesheet" href="css/bootstrap-responsive.css" type="text/css"/>-->
+	</head>
+	<body>		
+		<div id="mainMenu">
+			<ul class="menu"> 
+				<li>
+					<button>File</button>
+				</li>
+				<li>
+					<button>Edit</button>
+				</li>
+				<ul>
+		</div>
+		<div class="container">
+			<ul id="workspace">
+				<li>
+					<div id="objectsList">
+
+					</div>
+				</li>
+				<li>
+					<div id="canvasDiv">
+						<canvas id="canvas" right="200px" bottom="37px"></canvas>
+					</div>
+				</li>
+				<li>
+					<div id="toolbox">
+						<div  id="toolboxTabs">
+							<ul class="menu">
+								<li><button>Объекты</button></li>									
+								<li><button>Свойства</button></li>
+							</ul>
+						</div>
+						<div id="toolboxContent">
+							<ul class="objectItemsGroupContainer">
+								<li><button class="objectItemsGroup" onclick="GroupOnClick('roadGroup')">Дорога</button></li>
+								<li>
+									<div id="roadGroup" class="groupContainer">
+										<ul>
+											<li>
+												<button class="objectItem" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
+													<img src="Images/singleRoad.bmp" alt="Дорога">
+													Дорога
+												</button>
+											</li>
+											<li>
+												<button class="objectItem" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
+													<img src="Images/singleRoad.bmp" alt="Дорога">
+													Перекресток
+												</button>
+											</li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+							<ul class="objectItemsGroupContainer">
+								<li><button class="objectItemsGroup" onclick="GroupOnClick('markGroup')">Разметка</button></li>
+								<li>
+									<div id="markGroup" class="groupContainer">
+										<ul>
+											<li>
+												<button class="objectItem" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
+													<img src="Images/singleRoad.bmp" alt="Дорога">
+													Дорога
+												</button>
+											</li>
+											<li>
+												<button class="objectItem" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
+													<img src="Images/singleRoad.bmp" alt="Дорога">
+													Перекресток
+												</button>
+											</li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+							<ul class="objectItemsGroupContainer">
+								<li><button class="objectItemsGroup" onclick="GroupOnClick('transGroup')">Транспорт</button></li>
+								<li>
+									<div id="transGroup" class="groupContainer">
+										<ul>
+											<li>
+												<button class="objectItem" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
+													<img src="Images/singleRoad.bmp" alt="Дорога">
+													Дорога
+												</button>
+											</li>
+											<li>
+												<button class="objectItem" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
+													<img src="Images/singleRoad.bmp" alt="Дорога">
+													Перекресток
+												</button>
+											</li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+							<ul class="objectItemsGroupContainer">
+								<li><button class="objectItemsGroup" onclick="GroupOnClick('signGroup')">Знаки</button></li>
+								<li>
+									<div id="signGroup" class="groupContainer">
+										<ul>
+											<li>
+												<button class="objectItem" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
+													<img src="Images/singleRoad.bmp" alt="Дорога">
+													Дорога
+												</button>
+											</li>
+											<li>
+												<button class="objectItem" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
+													<img src="Images/singleRoad.bmp" alt="Дорога">
+													Перекресток
+												</button>
+											</li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</div>	
+					</div>
+				</li>
+			</ul> 
+		</div>
+	</body>
+	<script type="text/javascript">	
+
+		Array.min = function (array){
+			return Math.min.apply( Math, array );
+		}
+		var fCanvas;
+		window.onload = function (){
+			var oldCanvas = document.getElementById('canvas');
+			fCanvas = new fabric.Canvas('canvas', 
+			{ 
+				width: oldCanvas.parentNode.clientWidth, 
+				height: oldCanvas.parentNode.clientHeight
+			});
+			fCanvas.on('object:moving', function(e) {
+			});
+
+			fCanvas.on('object:modified', function(e) {
+				var activeObject = e.target;
+				if (activeObject.hasOwnProperty('name') && activeObject.name.indexOf('road') == 0){
+					fCanvas.forEachObject(function(obj){				  		
+						if (obj != activeObject && obj.hasOwnProperty('name') && obj.name.indexOf('road') == 0){
+							var objCorners = obj.get('oCoords');
+							var actCorners = activeObject.get('oCoords');						
+				    		createCrossRoad(objCorners, actCorners, {aName: activeObject.name, oName: obj.name});					    		
+				    	}
+					});			  	
+				}
+			});
+
+			var canvasDiv = document.getElementById('canvasDiv');
+			canvasDiv.tabIndex = 1000;
+			canvasDiv.addEventListener("keydown", canvKeyDown, false);
+		}
+
+		window.onresize = function() {
+			canvas.right = 200;
+			canvas.bottom = 5;
+			fCanvas.renderAll();
+		};
+
+		function canvKeyDown(e){
+			if (e.keyCode == 46){
+				fCanvas.remove(fCanvas.getActiveObject());
+			}
+		}
+
+		function CreateGraphicObject(id){
+			if (id == 'singleRoad'){
+				var w = 200; h = 100;
+				var road = new fabric.Rect({ width: w, height: h, fill: 'black'});
+				var mark = new fabric.Line([0, h/2, w, h/2], { stroke:'white', strokeWidth: 4, strokeDashArray: [20, 5] });
+				var roadGroup = new fabric.Group([road,mark],{ left: 100, top: 100 });
+				roadGroup.name = 'road' + fCanvas.getObjects().length;
+				
+				fCanvas.add(roadGroup);
+			}
+			if (id == 'crossRoad'){
+				var hr = 20; var crSize = 100;
+				// M - moveTo x y; Q - quadraticCurveTo topPoint x,y, endPoint x,y; L - lineTo x y
+				var cross = new fabric.Path('M 0 20 Q 20, 20, 20, 0 L 120 0 Q 120, 20, 140, 20 ' + 
+					'L 140 120 Q 120, 120, 120, 140 ' + 
+					'L 20 140 Q 20, 120, 0, 120 ', {
+						left: 0,
+						top: 0,
+						fill: 'black'
+					});
+
+				var roadGroup = new fabric.Group([cross],{ left: 100, top: 100 });
+				roadGroup.name = 'crossRoad' + fCanvas.getObjects().length;
+				
+				fCanvas.add(roadGroup);
+			}
+			fCanvas.renderAll();
+		}
+
+		function loadPattern(url, element) {
+			fabric.util.loadImage(url, function(img) {
+				element.setPatternFill({
+					source: img
+				});
+				fCanvas.renderAll();
+			});
+		}
+
+		function GroupOnClick(id){
+			document.getElementById('roadGroup').style.display = "none";
+			document.getElementById('markGroup').style.display = "none";
+			document.getElementById('transGroup').style.display = "none";
+			document.getElementById('signGroup').style.display = "none";
+			var group = document.getElementById(id);
+			if (group.style.display == "none"){
+				group.style.display = "block";
+			}else{
+				group.style.display = "none"
+			}
+		}
+
+  		function createCrossRoad(objCorners, actCorners, names){
+  			var actPrepared = prepareIntersection({start: {x: actCorners.tl.x, y: actCorners.tl.y}, end: {x: actCorners.tr.x, y: actCorners.tr.y}}, {start: {x: actCorners.bl.x, y: actCorners.bl.y}, end: {x: actCorners.br.x, y: actCorners.br.y}});
+    		var objPrepared = prepareIntersection({start: {x: objCorners.tl.x, y: objCorners.tl.y}, end: {x: objCorners.tr.x, y: objCorners.tr.y}}, {start: {x: objCorners.bl.x, y: objCorners.bl.y}, end: {x: objCorners.br.x, y: objCorners.br.y}});
+    		
+    		var corner1 = getCornerPoints(actPrepared.topLine.start, actPrepared.topLine.end, objPrepared.topLine.start, objPrepared.topLine.end, 'aToT');
+    		var corner2 = getCornerPoints(actPrepared.topLine.start, actPrepared.topLine.end, objPrepared.bottomLine.start, objPrepared.bottomLine.end, 'aToB');
+    		var corner3 = getCornerPoints(actPrepared.bottomLine.start, actPrepared.bottomLine.end, objPrepared.topLine.start, objPrepared.topLine.end, 'aBoT');
+    		var corner4 = getCornerPoints(actPrepared.bottomLine.start, actPrepared.bottomLine.end, objPrepared.bottomLine.start, objPrepared.bottomLine.end, 'aBoB');
+
+    		var minX = fCanvas.width, minY = fCanvas.height;
+    		var path ='';
+    		if (corner1){
+    			path += 'M ' + corner1.p1.x + ' ' + corner1.p1.y + ' Q ' + corner1.p2.x + ' ' + corner1.p2.y + ' ' + corner1.p3.x + ' ' + corner1.p3.y + ' ';
+    			minX = Math.min(corner1.p1.x,corner1.p2.x,corner1.p3.x, minX);
+    			minY = Math.min(corner1.p1.y,corner1.p2.y,corner1.p3.y, minY);
+    		}
+    		if (corner3){
+    			var c;
+    			if (path.indexOf('M ') < 0){
+    				c = 'M ';
+    			}else{
+    				c = 'L ';
+    			}
+    			path += c + corner3.p3.x + ' ' + corner3.p3.y + ' Q ' + corner3.p2.x + ' ' + corner3.p2.y + ' ' + corner3.p1.x + ' ' + corner3.p1.y + ' ';
+
+    			minX = Math.min(corner3.p1.x,corner3.p2.x,corner3.p3.x, minX);
+    			minY = Math.min(corner3.p1.y,corner3.p2.y,corner3.p3.y, minY);
+    		}
+    		if (corner4){
+    			var c;
+    			if (path.indexOf('M ') < 0){
+    				c = 'M ';
+    			}else{
+    				c = 'L ';
+    			}
+    			path += c + corner4.p1.x + ' ' + corner4.p1.y + ' Q ' + corner4.p2.x + ' ' + corner4.p2.y + ' ' + corner4.p3.x + ' ' + corner4.p3.y + ' ';
+
+    			minX = Math.min(corner4.p1.x,corner4.p2.x,corner4.p3.x, minX);
+    			minY = Math.min(corner4.p1.y,corner4.p2.y,corner4.p3.y, minY);
+    		}
+    		if (corner2){
+    			var c;
+    			if (path.indexOf('M ') < 0){
+    				c = 'M ';
+    			}else{
+    				c = 'L ';
+    			}
+    			path += c + corner2.p3.x + ' ' + corner2.p3.y + ' Q ' + corner2.p2.x + ' ' + corner2.p2.y + ' ' + corner2.p1.x + ' ' + corner2.p1.y;
+
+    			minX = Math.min(corner2.p1.x,corner2.p2.x,corner2.p3.x, minX);
+    			minY = Math.min(corner2.p1.y,corner2.p2.y,corner2.p3.y, minY);
+    		}
+
+    		if (path == '' || path.indexOf('L ') < 0) { return; }
+    		console.log(path);
+    		var minPoint = 
+    		{
+    			x: minX,
+    			y: minY
+    		}
+    		removeObjectByNameParts('cross_', names.aName, names.oName);
+
+    		var crossRoad = new fabric.Path(path, {
+  					left: minPoint.x,
+  					top: minPoint.y,
+  					fill: 'black'
+  				});
+    		crossRoad.name = 'cross_' + names.aName + '_' + names.oName;
+    		fCanvas.add(crossRoad);
+  		}
+
+  		function removeObjectByName(name){
+  			fCanvas.forEachObject(function(obj){
+  				if (obj.name == name) 
+  				{ 
+  					fCanvas.remove(obj); 
+  				}
+  			});
+  		}
+
+  		function removeObjectByNameParts(part1,part2,part3){
+  			fCanvas.forEachObject(function(obj){
+  				if (obj.name.indexOf(part1) > -1 &&
+  					obj.name.indexOf(part2) > -1 &&
+  					obj.name.indexOf(part3) > -1) 
+  				{ 
+  					fCanvas.remove(obj); 
+  				}
+  			});
+  		}
+
+	</script>
+</html>

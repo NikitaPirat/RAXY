@@ -1,0 +1,83 @@
+.page{
+	max-width:1200px;
+	width:100%;
+	margin: auto;
+	font-family: 'Segoe UI';
+	text-align: center;
+	font-size: 24px;
+}
+
+#box {
+	width:auto;
+	max-width:1200px;
+	position:relative;
+	line-height:300px; 	
+  	vertical-align: middle;
+}
+
+#stopSign {
+  	width: 100px;
+    height: 100px;
+    vertical-align: middle;
+}
+
+.box-anim1 {
+ 	animation: box-anim1 0.5s linear forwards;
+ 	-moz-animation: box-anim1 0.5s linear forwards;
+  -webkit-animation: box-anim1 0.5s linear forwards;
+}
+
+@keyframes box-anim1 {
+  from {
+    width: 0px;
+    height: 0px;
+    opacity: 0;
+    visibility: hidden;
+  }
+  to {
+    width: 290px;
+    height: 290px;
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@-moz-keyframes box-anim1 {
+  from {
+    width: 0px;
+    height: 0px;
+    opacity: 0;
+    visibility: hidden;
+  }
+  to {
+    width: 290px;
+    height: 290px;
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@-webkit-keyframes box-anim1 {
+  from {
+    width: 0px;
+    height: 0px;
+    opacity: 0;
+    visibility: hidden;
+  }
+  to {
+    width: 290px;
+    height: 290px;
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+#description{
+	font-family: "Segoe UI Black";
+    font-size: 60px;
+    font-weight: bold;
+    color: #000000;
+    background-color: transparent;
+	width: 90%;
+	margin: auto;
+}

@@ -1,0 +1,119 @@
+* { font-family: Sugoe UI, Sans-serif; outline: none; }
+body, html { margin: 0; padding: 0; overflow: hidden; background: url(background.gif); }
+button { padding: 6px 10px; color: rgb(255, 255, 255); background: rgba(0, 0, 0, 0.3); border: 1px solid rgb(40, 40, 40); border-radius: 4px; }
+button:hover, button.hover { background: rgba(0, 0, 0, 0.2); cursor: pointer; }
+button:active, button.active { background: rgba(0, 0, 0, 0.4); }
+
+#mainMenu{
+	background: rgb(150, 150, 150);
+	padding: 2px;
+	font-size: 1.2em;
+	height: 30px;
+}
+
+ul.menu{
+	margin: 0;
+	padding: 0;
+}
+
+ul.menu li {
+    display: inline-block;
+}
+
+ul.menu li button{
+	background: rgb(170, 170, 170);
+}
+
+ul.menu li button:hover {
+	background: rgba(0, 0, 0, 0.2);
+}
+
+ul.menu li button:active {
+	background: rgba(0, 0, 0, 0.4);
+}
+
+#toolboxTabs {
+	width: 100%;
+	height: 30px;
+	margin: 0;
+	list-style:none;
+	display: table-row;
+}
+
+#objectsList{
+	background: rgb(150, 150, 150);
+	left: 0;
+	top: 37px;
+	bottom: 5px;
+	width: 200px;
+	position: absolute;
+}
+
+#canvasDiv{
+	left: 200px;
+	right: 200px;
+	bottom: 5px;
+	top: 37px;
+	position: absolute;
+}
+
+#canvas{
+	left: 200px;
+	right: 200px;
+	bottom: 5px;
+	top: 37px;
+	background: rgb(255, 255, 255);
+}
+
+#toolbox{
+	background: rgb(150, 150, 150);
+	top: 37px;
+	width: 200px;
+	bottom: 5px;
+	right: 0px;
+	position: absolute;
+}
+
+#toolboxContent{
+	top: 40px;
+}
+
+.objectItemsGroupContainer{
+	padding: 0;
+}
+
+.objectItemsGroupContainer li{
+	padding: 0;
+	display: inline;
+}
+
+.groupContainer{
+	padding: 0;
+	border-style: inset;
+	background: rgb(190, 190, 190);
+	box-shadow: 2 2 2px rgba(0,0,0,0.5);
+	display: none;
+}
+
+.groupContainer ul{
+	padding: 5px;
+}
+
+.objectItemsGroup{
+	background: rgb(170, 170, 170);
+	float: left;
+	width: 100%;
+	margin: 0;
+}
+
+.objectItem{
+	background: rgb(170, 170, 170);
+	display: inline;	
+	margin: 5px 0px;
+	padding: 5px;
+	width: 100%;
+}
+
+.objectItem.icon{
+	padding-left: 11px;
+}
