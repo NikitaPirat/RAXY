@@ -36,8 +36,8 @@
 					<div id="toolbox">
 						<div  id="toolboxTabs">
 							<ul class="menu">
-								<li><button>Объекты</button></li>									
-								<li><button>Свойства</button></li>
+								<li><button onclick="showObjects();">Объекты</button></li>									
+								<li><button onclick="showProperties();">Свойства</button></li>
 							</ul>
 						</div>
 						<div id="toolboxContent">
@@ -319,5 +319,15 @@
   			});
   		}
 
+  		function showObjects(){
+  			document.getElementById('toolboxContent').style.display = "block";
+  			//
+  		}
+
+  		function showProperties(){
+  			document.getElementById('toolboxContent').style.display = "none";
+  			//
+  		}
+  		// test commit
 	</script>
 </html>
