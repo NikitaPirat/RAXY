@@ -11,6 +11,10 @@ button:active, button.active { background: rgba(0, 0, 0, 0.4); }
 	height: 30px;
 }
 
+.btn:active, .btn.active {
+	background: rgba(0, 0, 0, 0.4);
+}
+
 ul.menu{
 	margin: 0;
 	padding: 0;
