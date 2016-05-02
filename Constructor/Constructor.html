@@ -309,6 +309,51 @@
   				});
     		crossRoad.name = 'cross_' + names.aName + '_' + names.oName;
     		fCanvas.add(crossRoad);
+			
+			var actRoadPartStr1 = 'M ' + corner1.p4.x + ' ' + corner1.p4.y +
+				' L ' + corner3.p4.x + ' ' + corner3.p4.y +
+				' L ' + actPrepared.bottomLine.end.x + ' ' + actPrepared.bottomLine.end.y +
+				' L ' + actPrepared.topLine.end.x + ' ' + actPrepared.topLine.end.y;
+			var actRoadPartObj1 = new fabric.Path(actRoadPartStr1, {
+					left: Math.min(corner1.p4.x, corner3.p4.x, actPrepared.bottomLine.end.x, actPrepared.topLine.end.x),
+					top: Math.min(corner1.p4.y, corner3.p4.y, actPrepared.bottomLine.end.y, actPrepared.topLine.end.y),
+					fill: 'black',
+					name: 'cross_' + names.aName + '_' + names.oName + '_actRoadPartObj1'
+				});
+			fCanvas.add(actRoadPartObj1);
+			var actRoadPartStr2 = 'M ' + corner2.p4.x + ' ' + corner2.p4.y +
+				' L ' + corner4.p4.x + ' ' + corner4.p4.y +
+				' L ' + actPrepared.bottomLine.start.x + ' ' + actPrepared.bottomLine.start.y +
+				' L ' + actPrepared.topLine.start.x + ' ' + actPrepared.topLine.start.y;
+			var actRoadPartObj2 = new fabric.Path(actRoadPartStr2, {
+					left: Math.min(corner2.p4.x, corner4.p4.x, actPrepared.bottomLine.start.x, actPrepared.topLine.start.x),
+					top: Math.min(corner2.p4.y, corner4.p4.y, actPrepared.bottomLine.start.y, actPrepared.topLine.start.y),
+					fill: 'black',
+					name: 'cross_' + names.aName + '_' + names.oName + '_actRoadPartObj2'
+				});
+			fCanvas.add(actRoadPartObj2);
+			var actRoadPartStr3 = 'M ' + corner1.p4.x + ' ' + corner1.p4.y +
+				' L ' + corner2.p4.x + ' ' + corner2.p4.y +
+				' L ' + objPrepared.bottomLine.start.x + ' ' + objPrepared.bottomLine.start.y +
+				' L ' + objPrepared.topLine.start.x + ' ' + objPrepared.topLine.start.y;
+			var actRoadPartObj3 = new fabric.Path(actRoadPartStr3, {
+					left: Math.min(corner1.p4.x, corner2.p4.x, objPrepared.bottomLine.start.x, objPrepared.topLine.start.x),
+					top: Math.min(corner1.p4.y, corner2.p4.y, objPrepared.bottomLine.start.y, objPrepared.topLine.start.y),
+					fill: 'black',
+					name: 'cross_' + names.aName + '_' + names.oName + '_actRoadPartObj3'
+				});
+			fCanvas.add(actRoadPartObj3);
+			var actRoadPartStr4 = 'M ' + corner3.p4.x + ' ' + corner3.p4.y +
+				' L ' + corner4.p4.x + ' ' + corner4.p4.y +
+				' L ' + objPrepared.bottomLine.end.x + ' ' + objPrepared.bottomLine.end.y +
+				' L ' + objPrepared.topLine.end.x + ' ' + objPrepared.topLine.end.y;
+			var actRoadPartObj4 = new fabric.Path(actRoadPartStr4, {
+					left: Math.min(corner3.p4.x, corner4.p4.x, objPrepared.bottomLine.end.x, objPrepared.topLine.end.x),
+					top: Math.min(corner3.p4.y, corner4.p4.y, objPrepared.bottomLine.end.y, objPrepared.topLine.end.y),
+					fill: 'black',
+					name: 'cross_' + names.aName + '_' + names.oName + '_actRoadPartObj4'
+				});
+			fCanvas.add(actRoadPartObj4);
   		}
 
   		function removeObjectByName(name){
