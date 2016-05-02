@@ -156,6 +156,7 @@
 				height: oldCanvas.parentNode.clientHeight
 			});
 			fCanvas.on('object:moving', function(e) {
+				removeObjectByNameParts(['cross_', e.target.name]);
 			});
 
 			fCanvas.on('object:modified', function(e) {
@@ -299,7 +300,7 @@
     			x: minX,
     			y: minY
     		}
-    		removeObjectByNameParts('cross_', names.aName, names.oName);
+    		//removeObjectByNameParts(['cross_', names.aName, names.oName]);
 
     		var crossRoad = new fabric.Path(path, {
   					left: minPoint.x,
@@ -319,11 +320,20 @@
   			});
   		}
 
-  		function removeObjectByNameParts(part1,part2,part3){
+		// array []
+  		function removeObjectByNameParts(parts){
   			fCanvas.forEachObject(function(obj){
-  				if (obj.name.indexOf(part1) > -1 &&
-  					obj.name.indexOf(part2) > -1 &&
-  					obj.name.indexOf(part3) > -1) 
+				var del = false;
+				for (var i = 0; i < parts.length; i++){
+					if (obj.name.indexOf(parts[i]) > -1){
+						del = true;
+					}
+					else{
+						del = false;
+						break;
+					}
+				}
+  				if (del) 
   				{ 
   					fCanvas.remove(obj); 
   				}
