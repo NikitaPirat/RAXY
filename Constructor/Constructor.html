@@ -166,6 +166,7 @@
 						if (obj != activeObject && obj.hasOwnProperty('name') && obj.name.indexOf('road') == 0){
 							var objCorners = obj.get('oCoords');
 							var actCorners = activeObject.get('oCoords');						
+							removeObjectByNameParts(['cross_', activeObject.name, obj.name]);
 				    		createCrossRoad(objCorners, actCorners, {aName: activeObject.name, oName: obj.name});					    		
 				    	}
 					});			  	
@@ -293,14 +294,13 @@
     			minY = Math.min(corner2.p1.y,corner2.p2.y,corner2.p3.y, minY);
     		}
 
-    		if (path == '' || path.indexOf('L ') < 0) { return; }
-    		console.log(path);
+    		if (path == '' || path.indexOf('L ') < 0 || (path.match(/L /g) || []).length == 2) { return; }
+			
     		var minPoint = 
     		{
     			x: minX,
     			y: minY
-    		}
-    		//removeObjectByNameParts(['cross_', names.aName, names.oName]);
+    		}    		
 
     		var crossRoad = new fabric.Path(path, {
   					left: minPoint.x,

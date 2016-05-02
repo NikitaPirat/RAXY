@@ -256,13 +256,14 @@ function intersection(start1, end1, start2, end2) {
     return Point2f(start1, '+', pin_out);
 }
 
+// intersection of line defined by y=k*x+m and circle defined by x,y - center, r - radius
 function intersectionCircle1(x,y,r,k,m){
-    var d = (Math.pow((2*k*m-2*x-2*y*k),2)-(4+4*k*k)*(m*m-r*r+x*x+y*y-2*y*m));//(k*k*r*r+m*m-r*r);
+    var d = (Math.pow((2*k*m-2*x-2*y*k),2)-(4+4*k*k)*(m*m-r*r+x*x+y*y-2*y*m));
 
     if (d<0) { return false; }
 
-    var x1 = ((-(2*k*m-2*x-2*y*k)-Math.sqrt(d))/(2+2*k*k));//(-k*m + Math.sqrt(d))/(k*k+1);
-    var x2 = ((-(2*k*m-2*x-2*y*k)+Math.sqrt(d))/(2+2*k*k));//(-k*m - Math.sqrt(d))/(k*k+1);
+    var x1 = ((-(2*k*m-2*x-2*y*k)-Math.sqrt(d))/(2+2*k*k));
+    var x2 = ((-(2*k*m-2*x-2*y*k)+Math.sqrt(d))/(2+2*k*k));
     if (x1==x2){
         return {x: x1, y: yFunc2(k,m,x1)};
     }
@@ -273,6 +274,7 @@ function intersectionCircle1(x,y,r,k,m){
     }    
 }
 
+// intersection of line defined by points (x1,y1), (x2,y2) and circle defined by (x,y) - center, r - radius
 function intersectionCircle2(x,y,r,x1,y1,x2,y2){
     var k = getK(x1, y1, x2, y2);
     var m = getM(x1, y1, x2, y2);
