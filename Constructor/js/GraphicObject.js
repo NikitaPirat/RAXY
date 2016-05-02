@@ -9,6 +9,10 @@ GraphicObject.prototype.addGraphicObject = function (type){
 	alert (this.name);
 }
 
+// returns true or false depending on whether point belongs to the field
+// params:
+// x,y - position of the point
+// pointsArray - array of points which is describing the field (polygon) 
 // f.e. pointsArray = [{x:45, y:64}, {x:56, y:98}, {x:23, y:44}, {x:35, y:50}];
 function isPointInLocation(x,y,pointsArray){
 	var a = pointsArray[0]; var b = pointsArray[0]; 
@@ -275,6 +279,7 @@ function intersectionCircle2(x,y,r,x1,y1,x2,y2){
     return intersectionCircle1(x,y,r,k,m);
 }
 
+// defines which line is above and which is below
 //line = {start: {x: x1, y: y1}, end: {x: x2, y: y2}}
 function prepareIntersection(line11,line12){
     var testX = 100;
@@ -286,6 +291,18 @@ function prepareIntersection(line11,line12){
     }
 }
 
+// returns Corner Points: start, vertex, end of curve line, intersection point.
+// params: 
+// actStart - start point of first (active) line.
+// actEnd - end point  of first (active) line.
+// objStart - start point of second (not active) line.
+// objEnd - end point  of second (not active) line.
+// type - type of lines: 
+// aToT - intersection of active top and object top lines.
+// aToB - intersection of active top and object bottom lines.
+// aBoT - intersection of active bottom and object top lines.
+// aBoB - intersection of active bottom and object bottom lines.
+// this parameter defines which circle sector will be returned.
 function getCornerPoints(actStart, actEnd, objStart, objEnd, type){
     var inters = intersection(
         {x: actStart.x, y: actStart.y},
@@ -489,6 +506,5 @@ function getCornerPoints(actStart, actEnd, objStart, objEnd, type){
     var half2 = {x : (objPoint.x + inters.x)/2, y: (objPoint.y + inters.y)/2 };
     var median = intersection(inters, half1, actPoint, half2);   
 
-    return {p1: objPoint, p2: median, p3: actPoint, p4: inters};  
-    
+    return {p1: objPoint, p2: median, p3: actPoint, p4: inters};      
 }
