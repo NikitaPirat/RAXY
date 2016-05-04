@@ -223,7 +223,6 @@ function Point2f(start, type, end) {
     }
 }
 
-
 function intersection(start1, end1, start2, end2) {
     var dir1 = Point2f(end1, '-', start1)
     , dir2 = Point2f(end2, '-', start2);
@@ -256,6 +255,25 @@ function intersection(start1, end1, start2, end2) {
     return Point2f(start1, '+', pin_out);
 }
 
+// intersection of 2 lines defined by y=k1*x+m1 and y=k2*x+m2.
+// returns point of intersection or false if lines are parallel.
+function intersection2(k1,m1,k2,m2){
+    if (k1==k2) { return false; }
+    var x0 = (m2-m1)/(k1-k2);
+    return { x : x0, y : k1*x0+m1 };
+}
+
+// intersection of 2 lines.
+//
+// returns point of intersection or false if lines are parallel.
+function intersection3(line1Points, line2Points){
+    var k1 = getK(line1Points[0].x, line1Points[0].y, line1Points[1].x, line1Points[1].y);
+    var m1 = getM(line1Points[0].x, line1Points[0].y, line1Points[1].x, line1Points[1].y);
+    var k2 = getK(line2Points[0].x, line2Points[0].y, line2Points[1].x, line2Points[1].y);
+    var m2 = getM(line2Points[0].x, line2Points[0].y, line2Points[1].x, line2Points[1].y);
+    return intersection2 (k1,m1,k2,m2);  
+}
+
 // intersection of line defined by y=k*x+m and circle defined by x,y - center, r - radius
 function intersectionCircle1(x,y,r,k,m){
     var d = (Math.pow((2*k*m-2*x-2*y*k),2)-(4+4*k*k)*(m*m-r*r+x*x+y*y-2*y*m));
@@ -285,11 +303,27 @@ function intersectionCircle2(x,y,r,x1,y1,x2,y2){
 //line = {start: {x: x1, y: y1}, end: {x: x2, y: y2}}
 function prepareIntersection(line11,line12){
     var testX = 100;
+    var start, end;
+    if (yFunc1(line11.start.x, line11.start.y, line11.end.x, line11.end.y, line11.start.x) > 
+        yFunc1(line11.start.x, line11.start.y, line11.end.x, line11.end.y, line11.end.x)){
+        start = line11.end; end = line11.start;
+    }else{
+        start = line11.start; end = line11.end;
+    }
+    line11.start = start; line11.end = end;  
+    if (yFunc1(line12.start.x, line12.start.y, line12.end.x, line12.end.y, line12.start.x) > 
+        yFunc1(line12.start.x, line12.start.y, line12.end.x, line12.end.y, line12.end.x)){
+        start = line12.end; end = line12.start;
+    }else{
+        start = line12.start; end = line12.end;
+    }
+    line12.start = start; line12.end = end; 
+    
     if (yFunc1(line11.start.x, line11.start.y, line11.end.x, line11.end.y, testX) > 
         yFunc1(line12.start.x, line12.start.y, line12.end.x, line12.end.y, testX)){
-        return { topLine: line11, bottomLine: line12};
+        return { topLine: line11, bottomLine: line12, k: getK (line11.start.x, line11.start.y, line11.end.x, line11.end.y)};
     }else{
-        return result1 = { topLine: line12, bottomLine: line11 };
+        return result1 = { topLine: line12, bottomLine: line11, k: getK(line11.start.x, line11.start.y, line11.end.x, line11.end.y) };
     }
 }
 
