@@ -147,6 +147,7 @@
 		Array.min = function (array){
 			return Math.min.apply( Math, array );
 		}
+		
 		var fCanvas;
 		window.onload = function (){
 			var oldCanvas = document.getElementById('canvas');
@@ -156,7 +157,7 @@
 				height: oldCanvas.parentNode.clientHeight
 			});
 			fCanvas.on('object:moving', function(e) {
-				//removeObjectByNameParts(['cross_', e.target.name]);
+				removeObjectByNameParts(['cross_', e.target.name]);
 			});
 
 			fCanvas.on('object:modified', function(e) {
@@ -166,7 +167,7 @@
 						if (obj != activeObject && obj.hasOwnProperty('name') && obj.name.indexOf('road') == 0){
 							var objCorners = obj.get('oCoords');
 							var actCorners = activeObject.get('oCoords');						
-							//removeObjectByNameParts(['cross_', activeObject.name, obj.name]);
+							removeObjectByNameParts(['cross_', activeObject.name, obj.name]);
 				    		createCrossRoad(objCorners, actCorners, {aName: activeObject.name, oName: obj.name});					    		
 				    	}
 					});			  	
@@ -361,8 +362,7 @@
   				});
     		crossRoad.name = 'cross_' + names.aName + '_' + names.oName;
     		fCanvas.add(crossRoad);
-			var aObj = getObjectByName(names.aName);
-			var oObj = getObjectByName(names.oName);
+			var partName = 'road_'
 			// aToT aBoT
 			if (corner1.hasOwnProperty('p1') || corner3.hasOwnProperty('p1')){
 				var dirPoint;
@@ -381,7 +381,7 @@
 						left: Math.min(corner1.p4.x, corner3.p4.x, dirPoint1.x, dirPoint2.x),
 						top: Math.min(corner1.p4.y, corner3.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
-						name: 'cross_' + names.aName + '_' + names.oName + '_actRoadPartObj1'
+						name: partName + names.aName + '_' + names.oName + '_actRoadPartObj1'
 					});
 				fCanvas.add(actRoadPartObj1);
 			}
@@ -403,7 +403,7 @@
 						left: Math.min(corner2.p4.x, corner4.p4.x,  dirPoint1.x, dirPoint2.x),
 						top: Math.min(corner2.p4.y, corner4.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
-						name: 'cross_' + names.aName + '_' + names.oName + '_actRoadPartObj2'
+						name: partName + names.aName + '_' + names.oName + '_actRoadPartObj2'
 					});
 				fCanvas.add(actRoadPartObj2);
 			}
@@ -425,7 +425,7 @@
 						left: Math.min(corner1.p4.x, corner2.p4.x, dirPoint1.x, dirPoint2.x),
 						top: Math.min(corner1.p4.y, corner2.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
-						name: 'cross_' + names.aName + '_' + names.oName + '_actRoadPartObj3'
+						name: partName + names.aName + '_' + names.oName + '_actRoadPartObj3'
 					});
 				fCanvas.add(actRoadPartObj3);
 			}
@@ -447,11 +447,11 @@
 						left: Math.min(corner3.p4.x, corner4.p4.x, dirPoint1.x, dirPoint2.x),
 						top: Math.min(corner3.p4.y, corner4.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
-						name: 'cross_' + names.aName + '_' + names.oName + '_actRoadPartObj4'
+						name: partName + names.aName + '_' + names.oName + '_actRoadPartObj4'
 					});
 				fCanvas.add(actRoadPartObj4);
 			}
-			//removeObjectByName(names.aName); removeObjectByName(names.oName);
+			removeObjectByName(names.aName); removeObjectByName(names.oName);
   		}
 
   		function removeObjectByName(name){
