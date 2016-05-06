@@ -368,7 +368,7 @@
   				});
     		crossRoad.name = 'cross_' + names.aName + '_' + names.oName;
     		fCanvas.add(crossRoad);
-			var partName = 'road_'
+			var partName = 'road_' + names.aName + '_' + names.oName;
 			// aToT aBoT
 			if (corner1.hasOwnProperty('p1') || corner3.hasOwnProperty('p1')){
 				var dirPoint;
@@ -387,7 +387,7 @@
 						left: Math.min(corner1.p4.x, corner3.p4.x, dirPoint1.x, dirPoint2.x),
 						top: Math.min(corner1.p4.y, corner3.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
-						name: partName + names.aName + '_' + names.oName + '_actRoadPartObj1'
+						name: partName + '_actRoadPartObj1'
 					});
 				fCanvas.add(actRoadPartObj1);
 			}
@@ -409,7 +409,7 @@
 						left: Math.min(corner2.p4.x, corner4.p4.x,  dirPoint1.x, dirPoint2.x),
 						top: Math.min(corner2.p4.y, corner4.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
-						name: partName + names.aName + '_' + names.oName + '_actRoadPartObj2'
+						name: partName + '_actRoadPartObj2'
 					});
 				fCanvas.add(actRoadPartObj2);
 			}
@@ -431,7 +431,7 @@
 						left: Math.min(corner1.p4.x, corner2.p4.x, dirPoint1.x, dirPoint2.x),
 						top: Math.min(corner1.p4.y, corner2.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
-						name: partName + names.aName + '_' + names.oName + '_actRoadPartObj3'
+						name: partName + '_actRoadPartObj3'
 					});
 				fCanvas.add(actRoadPartObj3);
 			}
@@ -453,7 +453,7 @@
 						left: Math.min(corner3.p4.x, corner4.p4.x, dirPoint1.x, dirPoint2.x),
 						top: Math.min(corner3.p4.y, corner4.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
-						name: partName + names.aName + '_' + names.oName + '_actRoadPartObj4'
+						name: partName + '_actRoadPartObj4'
 					});
 				fCanvas.add(actRoadPartObj4);
 			}
