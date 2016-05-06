@@ -300,7 +300,7 @@ function intersectionCircle2(x,y,r,x1,y1,x2,y2){
 }
 
 // defines which line is above and which is below
-//line = {start: {x: x1, y: y1}, end: {x: x2, y: y2}}
+// line = {start: {x: x1, y: y1}, end: {x: x2, y: y2}}
 function prepareIntersection(line11,line12){
     var testX = 100;
     var start, end;
