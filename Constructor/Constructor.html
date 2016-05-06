@@ -37,7 +37,7 @@
 					<div id="toolbox">
 						<div  id="toolboxTabs">
 							<ul class="menu">
-								<li><button class="btn" onclick="showObjects();">Объекты</button></li>	
+								<li><button id="objectsBtn" class="btn" onclick="showObjects();">Объекты</button></li>	
 								<li><button class="btn" onclick="showProperties();">Свойства</button></li>
 							</ul>
 						</div>
@@ -141,7 +141,7 @@
 			</ul> 
 		</div>
 	</body>
-	<script type="text/javascript">	
+	<script type="text/javascript">
 		$('.btn').click(function() {
 			var btns = document.querySelectorAll(".btn.active");
 			[].forEach.call(btns, function(bt){
@@ -162,8 +162,23 @@
 				width: oldCanvas.parentNode.clientWidth, 
 				height: oldCanvas.parentNode.clientHeight
 			});
+			fCanvas.on('mouse:down', function(options) {
+				if (options.target){
+					var thisTarget = options.target; 
+					var mousePos = fCanvas.getPointer(options.e);
+
+					if (thisTarget.isType('group') && thisTarget.hasOwnProperty('name') 
+							&& thisTarget.name.indexOf('cross_') > -1) {
+						thisTarget.forEachObject(function(obj){
+							if (obj.containsPoint(mousePos)){
+								console.log(obj);
+							}							
+						});
+					}
+				}
+			});
 			fCanvas.on('object:moving', function(e) {
-				removeObjectByNameParts(['cross_', e.target.name]);
+				//removeObjectByNameParts(['cross_', e.target.name]);
 			});
 
 			fCanvas.on('object:modified', function(e) {
@@ -173,7 +188,7 @@
 						if (obj != activeObject && obj.hasOwnProperty('name') && obj.name.indexOf('road') == 0){
 							var objCorners = obj.get('oCoords');
 							var actCorners = activeObject.get('oCoords');						
-							removeObjectByNameParts(['cross_', activeObject.name, obj.name]);
+							//removeObjectByNameParts(['cross_', activeObject.name, obj.name]);
 				    		createCrossRoad(objCorners, actCorners, {aName: activeObject.name, oName: obj.name});					    		
 				    	}
 					});			  	
@@ -364,21 +379,18 @@
     		var crossRoad = new fabric.Path(path, {
   					left: minPoint.x,
   					top: minPoint.y,
-  					fill: 'black'
+  					fill: 'black',
+					name: 'cross_' + names.aName + '_' + names.oName
   				});
-    		crossRoad.name = 'cross_' + names.aName + '_' + names.oName;
-    		fCanvas.add(crossRoad);
+    		var crossObjects = [];
+    		//fCanvas.add(crossRoad);
+			crossObjects[0] = crossRoad;
 			var partName = 'road_' + names.aName + '_' + names.oName;
 			// aToT aBoT
 			if (corner1.hasOwnProperty('p1') || corner3.hasOwnProperty('p1')){
 				var dirPoint;
-				//if (actPrepared.k >= 0){
-					dirPoint1 = {x: actPrepared.bottomLine.end.x, y: actPrepared.bottomLine.end.y};
-					dirPoint2 = {x: actPrepared.topLine.end.x, y: actPrepared.topLine.end.y};
-				//}else{
-				//	dirPoint1 = {x: actPrepared.bottomLine.start.x, y: actPrepared.bottomLine.start.y};
-				//	dirPoint2 = {x: actPrepared.topLine.start.x, y: actPrepared.topLine.start.y};
-				//}
+				dirPoint1 = {x: actPrepared.bottomLine.end.x, y: actPrepared.bottomLine.end.y};
+				dirPoint2 = {x: actPrepared.topLine.end.x, y: actPrepared.topLine.end.y};
 				var actRoadPartStr1 = 'M ' + corner1.p4.x + ' ' + corner1.p4.y +
 					' L ' + corner3.p4.x + ' ' + corner3.p4.y +
 					' L ' + dirPoint1.x + ' ' + dirPoint1.y +
@@ -389,18 +401,14 @@
 						fill: 'black',
 						name: partName + '_actRoadPartObj1'
 					});
-				fCanvas.add(actRoadPartObj1);
+				crossObjects[crossObjects.length] = actRoadPartObj1;
+				//fCanvas.add(actRoadPartObj1);
 			}
 			// aToB aBoB
 			if (corner2.hasOwnProperty('p1') || corner4.hasOwnProperty('p1')){
 				var dirPoint;
-				//if (actPrepared.k >= 0){
-					dirPoint1 = {x: actPrepared.bottomLine.start.x, y: actPrepared.bottomLine.start.y};
-					dirPoint2 = {x: actPrepared.topLine.start.x, y: actPrepared.topLine.start.y};
-				//}else{
-				//	dirPoint1 = {x: actPrepared.bottomLine.end.x, y: actPrepared.bottomLine.end.y};
-				//	dirPoint2 = {x: actPrepared.topLine.end.x, y: actPrepared.topLine.end.y};
-				//}
+				dirPoint1 = {x: actPrepared.bottomLine.start.x, y: actPrepared.bottomLine.start.y};
+				dirPoint2 = {x: actPrepared.topLine.start.x, y: actPrepared.topLine.start.y};
 				var actRoadPartStr2 = 'M ' + corner2.p4.x + ' ' + corner2.p4.y +
 					' L ' + corner4.p4.x + ' ' + corner4.p4.y +
 					' L ' + dirPoint1.x + ' ' + dirPoint1.y +
@@ -411,18 +419,14 @@
 						fill: 'black',
 						name: partName + '_actRoadPartObj2'
 					});
-				fCanvas.add(actRoadPartObj2);
+				//fCanvas.add(actRoadPartObj2);
+				crossObjects[crossObjects.length] = actRoadPartObj2;
 			}
 			// aToT aToB
 			if (corner1.hasOwnProperty('p1') || corner2.hasOwnProperty('p1')){
 				var dirPoint;
-				//if (objPrepared.k >= 0){
-					dirPoint1 = {x: objPrepared.bottomLine.end.x, y: objPrepared.bottomLine.end.y};
-					dirPoint2 = {x: objPrepared.topLine.end.x, y: objPrepared.topLine.end.y};
-				//}else{
-				//	dirPoint1 = {x: objPrepared.bottomLine.start.x, y: objPrepared.bottomLine.start.y};
-				//	dirPoint2 = {x: objPrepared.topLine.start.x, y: objPrepared.topLine.start.y};
-				//}
+				dirPoint1 = {x: objPrepared.bottomLine.end.x, y: objPrepared.bottomLine.end.y};
+				dirPoint2 = {x: objPrepared.topLine.end.x, y: objPrepared.topLine.end.y};
 				var actRoadPartStr3 = 'M ' + corner1.p4.x + ' ' + corner1.p4.y +
 					' L ' + corner2.p4.x + ' ' + corner2.p4.y +
 					' L ' + dirPoint1.x + ' ' + dirPoint1.y +
@@ -433,18 +437,14 @@
 						fill: 'black',
 						name: partName + '_actRoadPartObj3'
 					});
-				fCanvas.add(actRoadPartObj3);
+				//fCanvas.add(actRoadPartObj3);
+				crossObjects[crossObjects.length] = actRoadPartObj3;
 			}
 			// aBoT aBoB
 			if (corner3.hasOwnProperty('p1') || corner4.hasOwnProperty('p1')){
 				var dirPoint;
-				//if (objPrepared.k >= 0){
-					dirPoint1 = {x: objPrepared.bottomLine.start.x, y: objPrepared.bottomLine.start.y};
-					dirPoint2 = {x: objPrepared.topLine.start.x, y: objPrepared.topLine.start.y};
-				//}else{
-				//	dirPoint1 = {x: objPrepared.bottomLine.end.x, y: objPrepared.bottomLine.end.y};
-				//	dirPoint2 = {x: objPrepared.topLine.end.x, y: objPrepared.topLine.end.y};
-				//}
+				dirPoint1 = {x: objPrepared.bottomLine.start.x, y: objPrepared.bottomLine.start.y};
+				dirPoint2 = {x: objPrepared.topLine.start.x, y: objPrepared.topLine.start.y};
 				var actRoadPartStr4 = 'M ' + corner3.p4.x + ' ' + corner3.p4.y +
 					' L ' + corner4.p4.x + ' ' + corner4.p4.y +
 					' L ' + dirPoint1.x + ' ' + dirPoint1.y +
@@ -455,9 +455,12 @@
 						fill: 'black',
 						name: partName + '_actRoadPartObj4'
 					});
-				fCanvas.add(actRoadPartObj4);
+				//fCanvas.add(actRoadPartObj4);
+				crossObjects[crossObjects.length] = actRoadPartObj4;
 			}
 			removeObjectByName(names.aName); removeObjectByName(names.oName);
+			var roadGroup = new fabric.Group(crossObjects, {name: 'cross_' + fCanvas.getObjects().length});
+			fCanvas.add(roadGroup);
   		}
 
   		function removeObjectByName(name){
