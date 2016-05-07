@@ -14,10 +14,10 @@
 		<div id="mainMenu">
 			<ul class="menu"> 
 				<li>
-					<button class="btn">File</button>
+					<button class="btn btn-default">File</button>
 				</li>
 				<li>
-					<button class="btn">Edit</button>
+					<button class="btn btn-default">Edit</button>
 				</li>
 				<ul>
 		</div>
@@ -32,24 +32,24 @@
 				<div id="toolbox" class="col-sm-2">
 					<div  id="toolboxTabs">
 						<ul class="menu">
-							<li><button id="objectsBtn" class="btn" onclick="showObjects();">Объекты</button></li>	
-							<li><button class="btn" onclick="showProperties();">Свойства</button></li>
+							<li><button id="objectsBtn" class="btn btn-default" onclick="showObjects();">Объекты</button></li>	
+							<li><button class="btn btn-default" onclick="showProperties();">Свойства</button></li>
 						</ul>
 					</div>
 					<div id="toolboxContent">
 						<ul class="objectItemsGroupContainer">
-							<li><button class="objectItemsGroup" onclick="GroupOnClick('roadGroup')">Дорога</button></li>
+							<li><button class="objectItemsGroup btn btn-default" onclick="GroupOnClick('roadGroup')">Дорога</button></li>
 							<li>
 								<div id="roadGroup" class="groupContainer">
 									<ul>
 										<li>
-											<button class="objectItem" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
+											<button class="objectItem btn btn-default" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
 												<img src="Images/singleRoad.bmp" alt="Дорога">
 												Дорога
 											</button>
 										</li>
 										<li>
-											<button class="objectItem" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
+											<button class="objectItem btn btn-default" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
 												<img src="Images/singleRoad.bmp" alt="Дорога">
 												Перекресток
 											</button>
@@ -59,18 +59,18 @@
 							</li>
 						</ul>
 						<ul class="objectItemsGroupContainer">
-							<li><button class="objectItemsGroup" onclick="GroupOnClick('markGroup')">Разметка</button></li>
+							<li><button class="objectItemsGroup btn btn-default" onclick="GroupOnClick('markGroup')">Разметка</button></li>
 							<li>
 								<div id="markGroup" class="groupContainer">
 									<ul>
 										<li>
-											<button class="objectItem" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
+											<button class="objectItem btn btn-default" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
 												<img src="Images/singleRoad.bmp" alt="Дорога">
 												Дорога
 											</button>
 										</li>
 										<li>
-											<button class="objectItem" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
+											<button class="objectItem btn btn-default" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
 												<img src="Images/singleRoad.bmp" alt="Дорога">
 												Перекресток
 											</button>
@@ -80,18 +80,18 @@
 							</li>
 						</ul>
 						<ul class="objectItemsGroupContainer">
-							<li><button class="objectItemsGroup" onclick="GroupOnClick('transGroup')">Транспорт</button></li>
+							<li><button class="objectItemsGroup btn btn-default" onclick="GroupOnClick('transGroup')">Транспорт</button></li>
 							<li>
 								<div id="transGroup" class="groupContainer">
 									<ul>
 										<li>
-											<button class="objectItem" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
+											<button class="objectItem btn btn-default" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
 												<img src="Images/singleRoad.bmp" alt="Дорога">
 												Дорога
 											</button>
 										</li>
 										<li>
-											<button class="objectItem" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
+											<button class="objectItem btn btn-default" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
 												<img src="Images/singleRoad.bmp" alt="Дорога">
 												Перекресток
 											</button>
@@ -101,18 +101,18 @@
 							</li>
 						</ul>
 						<ul class="objectItemsGroupContainer">
-							<li><button class="objectItemsGroup" onclick="GroupOnClick('signGroup')">Знаки</button></li>
+							<li><button class="objectItemsGroup btn btn-default" onclick="GroupOnClick('signGroup')">Знаки</button></li>
 							<li>
 								<div id="signGroup" class="groupContainer">
 									<ul>
 										<li>
-											<button class="objectItem" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
+											<button class="objectItem btn btn-default" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
 												<img src="Images/singleRoad.bmp" alt="Дорога">
 												Дорога
 											</button>
 										</li>
 										<li>
-											<button class="objectItem" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
+											<button class="objectItem btn btn-default" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
 												<img src="Images/singleRoad.bmp" alt="Дорога">
 												Перекресток
 											</button>
@@ -153,6 +153,7 @@
 		
 		var fCanvas;
 		window.onload = function (){
+			//onresize();
 			var oldCanvas = document.getElementById('canvas');
 			fCanvas = new fabric.Canvas('canvas', 
 			{ 
@@ -215,7 +216,7 @@
 
 		window.onresize = function() {
 			canvas.right = 200;
-			canvas.bottom = 5;
+			fCanvas.bottom = 5;
 			fCanvas.renderAll();
 		};
 

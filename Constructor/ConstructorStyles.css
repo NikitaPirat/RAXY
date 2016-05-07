@@ -1,18 +1,7 @@
-* { font-family: Sugoe UI, Sans-serif; outline: none; }
-body, html { margin: 0; padding: 0; overflow: hidden; background: url(background.gif); }
-button { padding: 6px 10px; color: rgb(255, 255, 255); background: rgba(0, 0, 0, 0.3); border: 1px solid rgb(40, 40, 40); border-radius: 4px; }
-button:hover, button.hover { background: rgba(0, 0, 0, 0.2); cursor: pointer; }
-button:active, button.active { background: rgba(0, 0, 0, 0.4); }
-
 #mainMenu{
-	background: rgb(150, 150, 150);
 	padding: 2px;
 	font-size: 1.2em;
 	height: 37px;
-}
-
-.btn:active, .btn.active {
-	background: rgba(0, 0, 0, 0.4);
 }
 
 ul.menu{
@@ -44,7 +33,6 @@ ul.menu li {
 }
 
 #objectsList{
-	background: rgb(150, 150, 150);
 	padding: 0;
 	height: 100%;
 }
@@ -59,7 +47,6 @@ ul.menu li {
 }
 
 #toolbox{
-	background: rgb(150, 150, 150);
 	height: 100%;
 }
 
@@ -79,7 +66,6 @@ ul.menu li {
 .groupContainer{
 	padding: 0;
 	border-style: inset;
-	background: rgb(190, 190, 190);
 	box-shadow: 2 2 2px rgba(0,0,0,0.5);
 	display: none;
 }
@@ -89,14 +75,12 @@ ul.menu li {
 }
 
 .objectItemsGroup{
-	background: rgb(170, 170, 170);
 	float: left;
 	width: 100%;
 	margin: 0;
 }
 
 .objectItem{
-	background: rgb(170, 170, 170);
 	display: inline;	
 	margin: 5px 0px;
 	padding: 5px;
