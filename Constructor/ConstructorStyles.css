@@ -1,5 +1,5 @@
 * { font-family: Sugoe UI, Sans-serif; outline: none; }
-body, html { margin: 0; padding: 0; overflow: hidden; background: url(background.gif); height:100%; }
+body, html { margin: 0; padding: 0; overflow: hidden; background: url(background.gif); }
 button { padding: 6px 10px; color: rgb(255, 255, 255); background: rgba(0, 0, 0, 0.3); border: 1px solid rgb(40, 40, 40); border-radius: 4px; }
 button:hover, button.hover { background: rgba(0, 0, 0, 0.2); cursor: pointer; }
 button:active, button.active { background: rgba(0, 0, 0, 0.4); }
@@ -8,7 +8,7 @@ button:active, button.active { background: rgba(0, 0, 0, 0.4); }
 	background: rgb(150, 150, 150);
 	padding: 2px;
 	font-size: 1.2em;
-	height: 30px;
+	height: 37px;
 }
 
 .btn:active, .btn.active {
@@ -31,46 +31,27 @@ ul.menu li {
 	list-style:none;
 	display: table-row;
 }
+
 .container-fluid
 {
-    display:table;
-	height:100%;
-    width: 100%;
-    margin-top: -30px;
-    padding-top: 50px;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+	margin-top: 5px;
+	height: 94vh;
 }
 
 .row
 {
     height: 100%;
-    display: table-row;
-}
-.col-sm-2.no-float, .col-sm-8.no-float {
-    float: none;
-}
-.col-sm-2
-{
-    display: table-cell;
-	width: 100%;
-    min-height: 100%;
-}
-.col-sm-8
-{
-    display: table-cell;
-	width: 100%;
-    min-height: 100%;
 }
 
 #objectsList{
 	background: rgb(150, 150, 150);
 	padding: 0;
-	
+	height: 100%;
 }
 
 #canvasDiv{
 	padding: 0;
+	height: 100%;
 }
 
 #canvas{
@@ -79,6 +60,7 @@ ul.menu li {
 
 #toolbox{
 	background: rgb(150, 150, 150);
+	height: 100%;
 }
 
 #toolboxContent{
