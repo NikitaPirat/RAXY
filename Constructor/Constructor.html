@@ -158,12 +158,16 @@
 		window.onload = function (){
 			var oldCanvas = document.getElementById('canvas');
 			document.getElementById('propertiesContent').style.display = "none";
-  			document.getElementById('toolboxContent').style.display = "block";	
-			$('objectsBtn').toggleClass('active');
+  			document.getElementById('toolboxContent').style.display = "block";
 			fCanvas = new fabric.Canvas('canvas', 
 			{ 
 				width: oldCanvas.parentNode.clientWidth, 
 				height: oldCanvas.parentNode.clientHeight
+			});
+			fCanvas.on('object:selected', function(options) {
+				var selectedObj = options.target;
+				showProperties(selectedObj);
+				console.log(selectedObj.name) ;
 			});
 			fCanvas.on('mouse:down', function(options) {
 				if (options.target){
@@ -182,11 +186,13 @@
 								  {x: thisTarget.left + corners.bl.x, y: thisTarget.top + corners.bl.y},
 								  {x: thisTarget.left + corners.br.x, y: thisTarget.top + corners.br.y}]))
 							{
-								console.log('x: ' + (thisTarget.left + corners.tl.x) + '; y: ' + (thisTarget.top + corners.tl.y)) ;
+								//console.log('x: ' + (thisTarget.left + corners.tl.x) + '; y: ' + (thisTarget.top + corners.tl.y)) ;
 								fCanvas.setActiveObject(obj);
 							}							
 						});
 					}
+				}else{
+					showObjects();
 				}
 			});
 			fCanvas.on('object:moving', function(e) {
@@ -393,9 +399,9 @@
   					top: minPoint.y,
   					fill: 'black',
 					name: 'cross_' + names.aName + '_' + names.oName,
-					perPixelTargetFind: true,
-					hasControls: false,
-					hasBorders: false
+					perPixelTargetFind: true//,
+					//hasControls: false,
+					//hasBorders: false
   				});
     		var crossObjects = [];
     		//fCanvas.add(crossRoad);
@@ -415,9 +421,9 @@
 						top: Math.min(corner1.p4.y, corner3.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
 						name: partName + '_actRoadPartObj1',
-						perPixelTargetFind: true,
-						hasControls: false,
-						hasBorders: false
+						perPixelTargetFind: true//,
+						//hasControls: false,
+						//hasBorders: false
 					});
 				crossObjects[crossObjects.length] = actRoadPartObj1;
 				//fCanvas.add(actRoadPartObj1);
@@ -436,9 +442,9 @@
 						top: Math.min(corner2.p4.y, corner4.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
 						name: partName + '_actRoadPartObj2',
-						perPixelTargetFind: true,
-						hasControls: false,
-						hasBorders: false
+						perPixelTargetFind: true//,
+						//hasControls: false,
+						//hasBorders: false
 					});
 				//fCanvas.add(actRoadPartObj2);
 				crossObjects[crossObjects.length] = actRoadPartObj2;
@@ -457,9 +463,9 @@
 						top: Math.min(corner1.p4.y, corner2.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
 						name: partName + '_actRoadPartObj3',
-						perPixelTargetFind: true,
-						hasControls: false,
-						hasBorders: false
+						perPixelTargetFind: true//,
+						//hasControls: false,
+						//hasBorders: false
 					});
 				//fCanvas.add(actRoadPartObj3);
 				crossObjects[crossObjects.length] = actRoadPartObj3;
@@ -478,9 +484,9 @@
 						top: Math.min(corner3.p4.y, corner4.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
 						name: partName + '_actRoadPartObj4',
-						perPixelTargetFind: true,
-						hasControls: false,
-						hasBorders: false
+						perPixelTargetFind: true//,
+						//hasControls: false,
+						//hasBorders: false
 					});
 				//fCanvas.add(actRoadPartObj4);
 				crossObjects[crossObjects.length] = actRoadPartObj4;
@@ -542,7 +548,7 @@
   			document.getElementById('toolboxContent').style.display = "block";	
   		}
 
-  		function showProperties(){
+  		function showProperties(object){
   			document.getElementById('toolboxContent').style.display = "none";
   			document.getElementById('propertiesContent').style.display = "block";
   		}
