@@ -30,11 +30,15 @@
 					<canvas id="canvas"></canvas>
 				</div>			
 				<div id="toolbox" class="col-sm-2">
-					<div  id="toolboxTabs">
-						<ul class="menu">
-							<li><button id="objectsBtn" class="btn btn-default" onclick="showObjects();">Объекты</button></li>	
-							<li><button class="btn btn-default" onclick="showProperties();">Свойства</button></li>
-						</ul>
+					<div  id="toolboxTabs" class = "container-fluid">
+						<div class="row">
+							<div class="col-sm-4">
+								<button class="btn btn-default" onclick="showObjects();">Objects</button>
+							</div>	
+							<div class="col-sm-4">
+								<button class="btn btn-default" onclick="showProperties();">Properties</button>
+							</div>
+						</div>
 					</div>
 					<div id="toolboxContent">
 						<ul class="objectItemsGroupContainer">
@@ -123,16 +127,16 @@
 						</ul>
 					</div>	
 					<div id="propertiesContent">
-						<ul>
-							<li>
-								<div class="property">
-									<ul>
-										<li>Имя</li>
-										<li><input type="text"></input></li>
-									</ul>
+						<div class="container-fluid">
+							<div class="row">
+								<div class="col-sm-4">
+									<p style="padding: 7px;">Name</p>
 								</div>
-							</li>
-						</ul>
+								<div class="col-sm-8">
+									<input id="property_name_input" class="form-control" type="text"></input>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>				
 			</div> 
@@ -153,7 +157,6 @@
 		
 		var fCanvas;
 		window.onload = function (){
-			//onresize();
 			var oldCanvas = document.getElementById('canvas');
 			fCanvas = new fabric.Canvas('canvas', 
 			{ 
@@ -163,7 +166,8 @@
 			fCanvas.on('object:selected', function(options) {
 				var selectedObj = options.target;
 				showProperties(selectedObj);
-				console.log(selectedObj.name) ;
+				document.getElementById("property_name_input").value = selectedObj.name;
+				//console.log(selectedObj.name) ;
 			});
 			fCanvas.on('mouse:down', function(options) {
 				if (options.target){
