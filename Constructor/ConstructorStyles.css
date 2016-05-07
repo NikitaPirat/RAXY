@@ -1,5 +1,5 @@
 * { font-family: Sugoe UI, Sans-serif; outline: none; }
-body, html { margin: 0; padding: 0; overflow: hidden; background: url(background.gif); }
+body, html { margin: 0; padding: 0; overflow: hidden; background: url(background.gif); height:100%; }
 button { padding: 6px 10px; color: rgb(255, 255, 255); background: rgba(0, 0, 0, 0.3); border: 1px solid rgb(40, 40, 40); border-radius: 4px; }
 button:hover, button.hover { background: rgba(0, 0, 0, 0.2); cursor: pointer; }
 button:active, button.active { background: rgba(0, 0, 0, 0.4); }
@@ -24,18 +24,6 @@ ul.menu li {
     display: inline-block;
 }
 
-ul.menu li button{
-	background: rgb(170, 170, 170);
-}
-
-ul.menu li button:hover {
-	background: rgba(0, 0, 0, 0.2);
-}
-
-ul.menu li button:active {
-	background: rgba(0, 0, 0, 0.4);
-}
-
 #toolboxTabs {
 	width: 100%;
 	height: 30px;
@@ -43,39 +31,54 @@ ul.menu li button:active {
 	list-style:none;
 	display: table-row;
 }
+.container-fluid
+{
+    display:table;
+	height:100%;
+    width: 100%;
+    margin-top: -30px;
+    padding-top: 50px;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.row
+{
+    height: 100%;
+    display: table-row;
+}
+.col-sm-2.no-float, .col-sm-8.no-float {
+    float: none;
+}
+.col-sm-2
+{
+    display: table-cell;
+	width: 100%;
+    min-height: 100%;
+}
+.col-sm-8
+{
+    display: table-cell;
+	width: 100%;
+    min-height: 100%;
+}
 
 #objectsList{
 	background: rgb(150, 150, 150);
-	left: 0;
-	top: 37px;
-	bottom: 5px;
-	width: 200px;
-	position: absolute;
+	padding: 0;
+	
 }
 
 #canvasDiv{
-	left: 200px;
-	right: 200px;
-	bottom: 5px;
-	top: 37px;
-	position: absolute;
+	padding: 0;
 }
 
 #canvas{
-	left: 200px;
-	right: 200px;
-	bottom: 5px;
-	top: 37px;
 	background: rgb(255, 255, 255);
 }
 
 #toolbox{
 	background: rgb(150, 150, 150);
-	top: 37px;
-	width: 200px;
-	bottom: 5px;
-	right: 0px;
-	position: absolute;
 }
 
 #toolboxContent{
@@ -120,4 +123,21 @@ ul.menu li button:active {
 
 .objectItem.icon{
 	padding-left: 11px;
+}
+
+#propertiesContent{
+	display: none;
+}
+
+#propertiesContent ul{
+	 list-style-type: none;
+	 display: flex;
+}
+
+.property ul {
+	list-style-type: none;
+}
+
+.property ul li{
+	display: inline;
 }
