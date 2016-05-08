@@ -21,7 +21,7 @@
 	
 	</head>
 	<body>		
-		<div class="btn-group">
+		<div class="btn-group" style="width: 100%;">
 			<button class="btn btn-default">File</button>
 			<button class="btn btn-default">Edit</button>
 		</div>
@@ -36,7 +36,7 @@
 				<div id="toolbox" class="col-sm-2">
 					<div  id="toolboxTabs" class = "btn-group">
 						<button class="btn btn-default" onclick="showObjects();">Objects</button>
-						<button class="btn btn-default" onclick="showProperties();">Properties</button>
+						<button class="btn btn-default" onclick="showProperties(fCanvas.getActiveObject());">Properties</button>
 					</div>
 					<div id="toolboxContent" class="panel-group">
 						<div class="panel panel-default">
@@ -486,24 +486,30 @@
   		function showProperties(object){
   			document.getElementById('toolboxContent').style.display = "none";
   			document.getElementById('propertiesContent').style.display = "block";
-			
 			// clear properties
 			var myNode = document.getElementById('propertiesList');
 			while (myNode.firstChild) {
 				myNode.removeChild(myNode.firstChild);
 			}
-			var properties = [];
-			if (object.hasOwnProperty('name') && object.name.indexOf('road') > -1){
-				properties = roadProperties;
-			}
-			for(var i = 0; i < properties.length; i++){
-				addProperty(properties[i]);
+			
+			if (object){				
+				var properties = [];
+				if (object.hasOwnProperty('name') && object.name.indexOf('road') > -1){
+					properties = roadProperties;
+				}
+				for(var i = 0; i < properties.length; i++){
+					var val = '';
+					if (object.hasOwnProperty(properties[i])){
+						val = object[properties[i]];
+					}
+					addProperty(properties[i], val);
+				}
 			}
   		}
 		  
-		function addProperty(name){
+		function addProperty(name, val){
 			var txtEl = document.createElement("p");
-			txtEl.style="padding: 7px;";
+			txtEl.style="padding: 7px; margin-right: 5px;";
 			var txtNode = document.createTextNode(name);
 			txtEl.appendChild(txtNode);		
 			
@@ -514,7 +520,11 @@
 			var inpEl = document.createElement("input");
 			inpEl.id = name + "_input";
 			inpEl.type="text";
-			inpEl.className="form-control";	
+			inpEl.className="form-control";
+			inpEl.value = val;
+			inpEl.onchange = function (){
+				fCanvas.getActiveObject()[name] = inpEl.value;
+			};
 			
 			var col8 = document.createElement('div');
 			col8.className = "col-sm-8";

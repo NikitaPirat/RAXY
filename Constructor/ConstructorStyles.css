@@ -7,11 +7,13 @@
 .row-fullHeight
 {
     height: 100%;
+	/*border: 1px solid #888;*/
 }
 
 #objectsList{
 	padding: 0;
 	height: 100%;
+	/*border: 1px solid #888;*/
 }
 
 #canvasDiv{
@@ -25,6 +27,7 @@
 
 #toolbox{
 	height: 100%;
+	/*border: 1px solid #888;*/
 }
 
 .objectItem.icon{
