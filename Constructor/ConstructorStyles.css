@@ -1,26 +1,3 @@
-#mainMenu{
-	padding: 2px;
-	font-size: 1.2em;
-	height: 37px;
-}
-
-ul.menu{
-	margin: 0;
-	padding: 0;
-}
-
-ul.menu li {
-    display: inline-block;
-}
-
-#toolboxTabs {
-	width: 100%;
-	height: 30px;
-	margin: 0;
-	list-style:none;
-	display: table-row;
-}
-
 .container-fluid
 {
 	margin-top: 5px;
@@ -50,64 +27,10 @@ ul.menu li {
 	height: 100%;
 }
 
-#toolboxContent{
-	top: 40px;
-}
-
-.objectItemsGroupContainer{
-	padding: 0;
-}
-
-.objectItemsGroupContainer li{
-	padding: 0;
-	display: inline;
-}
-
-.groupContainer{
-	padding: 0;
-	border-style: inset;
-	box-shadow: 2 2 2px rgba(0,0,0,0.5);
-	display: none;
-}
-
-.groupContainer ul{
-	padding: 5px;
-}
-
-.objectItemsGroup{
-	float: left;
-	width: 100%;
-	margin: 0;
-}
-
-.objectItem{
-	display: inline;	
-	margin: 5px 0px;
-	padding: 5px;
-	width: 100%;
-}
-
 .objectItem.icon{
 	padding-left: 11px;
 }
 
 #propertiesContent{
 	display: none;
-}
-
-#propertiesContent ul{
-	 list-style-type: none;
-	 display: flex;
-}
-
-.property{
-	padding: 5px;	
-}
-
-.property ul {
-	list-style-type: none;
-}
-
-.property ul li{
-	display: inline;
 }

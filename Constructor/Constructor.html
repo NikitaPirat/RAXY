@@ -3,23 +3,26 @@
 <head>
 	<meta charset="UTF-8"/>
 	<title>RAXY</title>
+	
+	<!-- jquery-->
 	<script src="js/jquery.js" type="text/javascript"></script>
-	<script src="js/GraphicObject.js" type="text/javascript"></script>
+	
+	<!-- fabric.js -->
 	<script src="js/fabric.js-1.6.0-rc.1/dist/fabric.js" type="text/javascript"></script>
-	<script src="js/bootstrap.min.js" type="text/javascript"></script>
-	<link rel="stylesheet" href="ConstructorStyles.css" type="text/css"/>		
+		
+	<!-- bootstrap -->	
 	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css"/>
+	<script src="js/bootstrap.min.js" type="text/javascript"></script>
+	
+	<!-- my scripts and stylesheets -->	
+	<link rel="stylesheet" href="ConstructorStyles.css" type="text/css"/>
+	<script src="js/GraphicObject.js" type="text/javascript"></script>
+	
 	</head>
 	<body>		
-		<div id="mainMenu">
-			<ul class="menu"> 
-				<li>
-					<button class="btn btn-default">File</button>
-				</li>
-				<li>
-					<button class="btn btn-default">Edit</button>
-				</li>
-				<ul>
+		<div class="btn-group">
+			<button class="btn btn-default">File</button>
+			<button class="btn btn-default">Edit</button>
 		</div>
 		<div class="container-fluid">
 			<div class="row">
@@ -30,101 +33,49 @@
 					<canvas id="canvas"></canvas>
 				</div>			
 				<div id="toolbox" class="col-sm-2">
-					<div  id="toolboxTabs" class = "container-fluid">
-						<div class="row">
-							<div class="col-sm-4">
-								<button class="btn btn-default" onclick="showObjects();">Objects</button>
-							</div>	
-							<div class="col-sm-4">
-								<button class="btn btn-default" onclick="showProperties();">Properties</button>
+					<div  id="toolboxTabs" class = "btn-group">
+						<button class="btn btn-default" onclick="showObjects();">Objects</button>
+						<button class="btn btn-default" onclick="showProperties();">Properties</button>
+					</div>
+					<div id="toolboxContent" class="panel-group">
+						<div class="panel panel-default">
+							<a class="btn btn-default" data-toggle="collapse" data-parent="#toolboxContent" href="#roadGroup" style="width:100%">
+								Road
+							</a>
+							<div id="roadGroup" class="panel-collapse collapse">
+								<div class="panel-body">
+									<div class="btn-group-vertical" style="width: 100%;">
+										<button type="button" class="btn btn-default" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
+											<img src="Images/singleRoad.bmp" alt="Road">
+											Дорога
+										</button>
+										<button type="button" class="btn btn-default" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
+											<img src="Images/singleRoad.bmp" alt="Road">
+											Перекресток
+										</button>
+									</div>
+								</div>
 							</div>
 						</div>
-					</div>
-					<div id="toolboxContent">
-						<ul class="objectItemsGroupContainer">
-							<li><button class="objectItemsGroup btn btn-default" onclick="GroupOnClick('roadGroup')">Дорога</button></li>
-							<li>
-								<div id="roadGroup" class="groupContainer">
-									<ul>
-										<li>
-											<button class="objectItem btn btn-default" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
-												<img src="Images/singleRoad.bmp" alt="Дорога">
-												Дорога
-											</button>
-										</li>
-										<li>
-											<button class="objectItem btn btn-default" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
-												<img src="Images/singleRoad.bmp" alt="Дорога">
-												Перекресток
-											</button>
-										</li>
-									</ul>
+						<div class="panel panel-default">
+							<a class="btn btn-default" data-toggle="collapse" data-parent="#toolboxContent" href="#markGroup" style="width:100%">
+								Mark Up
+							</a>
+							<div id="markGroup" class="panel-collapse collapse">
+								<div class="panel-body">
+									<div class="btn-group-vertical" style="width: 100%;">
+										<button type="button" class="btn btn-default" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
+											<img src="Images/singleRoad.bmp" alt="Road">
+											Дорога
+										</button>
+										<button type="button" class="btn btn-default" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
+											<img src="Images/singleRoad.bmp" alt="Road">
+											Перекресток
+										</button>
+									</div>
 								</div>
-							</li>
-						</ul>
-						<ul class="objectItemsGroupContainer">
-							<li><button class="objectItemsGroup btn btn-default" onclick="GroupOnClick('markGroup')">Разметка</button></li>
-							<li>
-								<div id="markGroup" class="groupContainer">
-									<ul>
-										<li>
-											<button class="objectItem btn btn-default" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
-												<img src="Images/singleRoad.bmp" alt="Дорога">
-												Дорога
-											</button>
-										</li>
-										<li>
-											<button class="objectItem btn btn-default" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
-												<img src="Images/singleRoad.bmp" alt="Дорога">
-												Перекресток
-											</button>
-										</li>
-									</ul>
-								</div>
-							</li>
-						</ul>
-						<ul class="objectItemsGroupContainer">
-							<li><button class="objectItemsGroup btn btn-default" onclick="GroupOnClick('transGroup')">Транспорт</button></li>
-							<li>
-								<div id="transGroup" class="groupContainer">
-									<ul>
-										<li>
-											<button class="objectItem btn btn-default" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
-												<img src="Images/singleRoad.bmp" alt="Дорога">
-												Дорога
-											</button>
-										</li>
-										<li>
-											<button class="objectItem btn btn-default" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
-												<img src="Images/singleRoad.bmp" alt="Дорога">
-												Перекресток
-											</button>
-										</li>
-									</ul>
-								</div>
-							</li>
-						</ul>
-						<ul class="objectItemsGroupContainer">
-							<li><button class="objectItemsGroup btn btn-default" onclick="GroupOnClick('signGroup')">Знаки</button></li>
-							<li>
-								<div id="signGroup" class="groupContainer">
-									<ul>
-										<li>
-											<button class="objectItem btn btn-default" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
-												<img src="Images/singleRoad.bmp" alt="Дорога">
-												Дорога
-											</button>
-										</li>
-										<li>
-											<button class="objectItem btn btn-default" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
-												<img src="Images/singleRoad.bmp" alt="Дорога">
-												Перекресток
-											</button>
-										</li>
-									</ul>
-								</div>
-							</li>
-						</ul>
+							</div>
+						</div>									
 					</div>	
 					<div id="propertiesContent">
 						<div class="container-fluid">
@@ -219,10 +170,14 @@
 		}
 
 		window.onresize = function() {
-			canvas.right = 200;
-			fCanvas.bottom = 5;
-			fCanvas.renderAll();
+			var canvas = document.getElementById("canvas");
+			canvas.width = 900; //style.width = "100%";
+			canvas.height = 600;//style.height = "100%";
 		};
+		
+		function myOnresize(){
+			
+		}
 
 		function canvKeyDown(e){
 			if (e.keyCode == 46){
@@ -269,7 +224,7 @@
 		}
 
 		function GroupOnClick(id){
-			document.getElementById('roadGroup').style.display = "none";
+			/*document.getElementById('roadGroup').style.display = "none";
 			document.getElementById('markGroup').style.display = "none";
 			document.getElementById('transGroup').style.display = "none";
 			document.getElementById('signGroup').style.display = "none";
@@ -278,7 +233,7 @@
 				group.style.display = "block";
 			}else{
 				group.style.display = "none"
-			}
+			}*/
 		}
 
   		function createCrossRoad(objCorners, actCorners, names){
