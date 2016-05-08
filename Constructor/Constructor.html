@@ -79,15 +79,7 @@
 						</div>									
 					</div>	
 					<div id="propertiesContent">
-						<div id="propertiesList" class="container-fluid">
-							<div class="row">
-								<div class="col-sm-4">
-									<p style="padding: 7px;">Name</p>
-								</div>
-								<div class="col-sm-8">
-									<input id="property_name_input" class="form-control" type="text"></input>
-								</div>
-							</div>
+						<div id="propertiesList" class="container-fluid" style="height: auto;">
 						</div>
 					</div>
 				</div>				
@@ -118,7 +110,7 @@
 			fCanvas.on('object:selected', function(options) {
 				var selectedObj = options.target;
 				showProperties(selectedObj);
-				document.getElementById("property_name_input").value = selectedObj.name;
+				//document.getElementById("property_name_input").value = selectedObj.name;
 				//console.log(selectedObj.name) ;
 			});
 			fCanvas.on('mouse:down', function(options) {
@@ -494,7 +486,19 @@
   		function showProperties(object){
   			document.getElementById('toolboxContent').style.display = "none";
   			document.getElementById('propertiesContent').style.display = "block";
-			addProperty("Lines");
+			
+			// clear properties
+			var myNode = document.getElementById('propertiesList');
+			while (myNode.firstChild) {
+				myNode.removeChild(myNode.firstChild);
+			}
+			var properties = [];
+			if (object.hasOwnProperty('name') && object.name.indexOf('road') > -1){
+				properties = roadProperties;
+			}
+			for(var i = 0; i < properties.length; i++){
+				addProperty(properties[i]);
+			}
   		}
 		  
 		function addProperty(name){
@@ -508,6 +512,7 @@
 			col4.appendChild(txtEl);
 			
 			var inpEl = document.createElement("input");
+			inpEl.id = name + "_input";
 			inpEl.type="text";
 			inpEl.className="form-control";	
 			
@@ -522,18 +527,6 @@
 			
 			var propList = document.getElementById("propertiesList");
 			propList.appendChild(divRow);
-			propList.style="height: auto";
 		}
-		
-		/*
-			<div class="row">
-				<div class="col-sm-4">
-					<p style="padding: 7px;">Name</p>
-				</div>
-				<div class="col-sm-8">
-					<input id="property_name_input" class="form-control" type="text"></input>
-				</div>
-			</div>
-		*/
 	</script>
 </html>
