@@ -16,7 +16,8 @@
 	
 	<!-- my scripts and stylesheets -->	
 	<link rel="stylesheet" href="ConstructorStyles.css" type="text/css"/>
-	<script src="js/GraphicObject.js" type="text/javascript"></script>
+	<script src="js/helper.js" type="text/javascript"></script>
+	<script src="js/properties.js" type="text/javascript"></script>
 	
 	</head>
 	<body>		
@@ -25,7 +26,7 @@
 			<button class="btn btn-default">Edit</button>
 		</div>
 		<div class="container-fluid">
-			<div class="row">
+			<div class="row row-fullHeight">
 				<div id="objectsList" class="col-sm-2">
 					
 				</div>
@@ -78,7 +79,7 @@
 						</div>									
 					</div>	
 					<div id="propertiesContent">
-						<div class="container-fluid">
+						<div id="propertiesList" class="container-fluid">
 							<div class="row">
 								<div class="col-sm-4">
 									<p style="padding: 7px;">Name</p>
@@ -493,6 +494,46 @@
   		function showProperties(object){
   			document.getElementById('toolboxContent').style.display = "none";
   			document.getElementById('propertiesContent').style.display = "block";
+			addProperty("Lines");
   		}
+		  
+		function addProperty(name){
+			var txtEl = document.createElement("p");
+			txtEl.style="padding: 7px;";
+			var txtNode = document.createTextNode(name);
+			txtEl.appendChild(txtNode);		
+			
+			var col4 = document.createElement('div');
+			col4.className = "col-sm-4";
+			col4.appendChild(txtEl);
+			
+			var inpEl = document.createElement("input");
+			inpEl.type="text";
+			inpEl.className="form-control";	
+			
+			var col8 = document.createElement('div');
+			col8.className = "col-sm-8";
+			col8.appendChild(inpEl);
+			
+			var divRow = document.createElement('div');
+			divRow.className = "row";			
+			divRow.appendChild(col4);			
+			divRow.appendChild(col8);
+			
+			var propList = document.getElementById("propertiesList");
+			propList.appendChild(divRow);
+			propList.style="height: auto";
+		}
+		
+		/*
+			<div class="row">
+				<div class="col-sm-4">
+					<p style="padding: 7px;">Name</p>
+				</div>
+				<div class="col-sm-8">
+					<input id="property_name_input" class="form-control" type="text"></input>
+				</div>
+			</div>
+		*/
 	</script>
 </html>
