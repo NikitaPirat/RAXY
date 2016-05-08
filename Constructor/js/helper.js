@@ -1,14 +1,3 @@
-function GraphicObject(name){
-	this.name = name;
-	this.posX = 0;
-	this.posY = 0;
-}
-
-GraphicObject.prototype.addGraphicObject = function (type){
-	
-	alert (this.name);
-}
-
 // returns true or false depending on whether point belongs to the field
 // params:
 // x,y - position of the point

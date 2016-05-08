@@ -223,19 +223,6 @@
 			});
 		}
 
-		function GroupOnClick(id){
-			/*document.getElementById('roadGroup').style.display = "none";
-			document.getElementById('markGroup').style.display = "none";
-			document.getElementById('transGroup').style.display = "none";
-			document.getElementById('signGroup').style.display = "none";
-			var group = document.getElementById(id);
-			if (group.style.display == "none"){
-				group.style.display = "block";
-			}else{
-				group.style.display = "none"
-			}*/
-		}
-
   		function createCrossRoad(objCorners, actCorners, names){
   			var actPrepared = prepareIntersection({start: {x: actCorners.tl.x, y: actCorners.tl.y}, end: {x: actCorners.tr.x, y: actCorners.tr.y}}, {start: {x: actCorners.bl.x, y: actCorners.bl.y}, end: {x: actCorners.br.x, y: actCorners.br.y}});
     		var objPrepared = prepareIntersection({start: {x: objCorners.tl.x, y: objCorners.tl.y}, end: {x: objCorners.tr.x, y: objCorners.tr.y}}, {start: {x: objCorners.bl.x, y: objCorners.bl.y}, end: {x: objCorners.br.x, y: objCorners.br.y}});
