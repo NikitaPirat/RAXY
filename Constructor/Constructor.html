@@ -18,6 +18,7 @@
 	<link rel="stylesheet" href="ConstructorStyles.css" type="text/css"/>
 	<script src="js/helper.js" type="text/javascript"></script>
 	<script src="js/properties.js" type="text/javascript"></script>
+	<script src="js/templates.js" type="text/javascript"></script>
 	
 	</head>
 	<body>		
@@ -179,22 +180,14 @@
 			canvasDiv.tabIndex = 1000;
 			canvasDiv.addEventListener("keydown", canvKeyDown, false);
 		}
-
-		window.onresize = function() {
-			var parent = document.getElementById("canvasDiv");
-			var c_container = document.getElementsByClassName("canvas-container");
-			if (c){
-				c_container[0].style = 'width: ' + parent.offsetWidth + 'px; height: + ' + parent.offsetHeight + 'px;';
-			}
-			var c_upper = document.getElementsByClassName("upper-canvas");
-			if (c){
-				c_upper[0].style = 'width: ' + parent.offsetWidth + 'px; height: + ' + parent.offsetHeight + 'px;';
-			}
-			var c = document.getElementById("canvas");
-			if (c){
-				c.style = 'width: ' + parent.offsetWidth + 'px; height: + ' + parent.offsetHeight + 'px;';
-			}
-		};
+		
+		window.onresize = function(){
+			fCanvas.setHeight($('#canvasDiv').height()); 
+			fCanvas.setWidth($('#canvasDiv').width()); 
+			fCanvas.calcOffset();
+			fCanvas.style="background: white;";
+			fCanvas.renderAll(); 
+		}
 
 		function canvKeyDown(e){
 			if (e.keyCode == 46){
