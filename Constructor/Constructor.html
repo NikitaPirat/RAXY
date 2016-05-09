@@ -163,14 +163,20 @@
 		}
 
 		window.onresize = function() {
-			var canvas = document.getElementById("canvas");
-			canvas.width = 900; //style.width = "100%";
-			canvas.height = 600;//style.height = "100%";
+			var parent = document.getElementById("canvasDiv");
+			var c_container = document.getElementsByClassName("canvas-container");
+			if (c){
+				c_container[0].style = 'width: ' + parent.offsetWidth + 'px; height: + ' + parent.offsetHeight + 'px;';
+			}
+			var c_upper = document.getElementsByClassName("upper-canvas");
+			if (c){
+				c_upper[0].style = 'width: ' + parent.offsetWidth + 'px; height: + ' + parent.offsetHeight + 'px;';
+			}
+			var c = document.getElementById("canvas");
+			if (c){
+				c.style = 'width: ' + parent.offsetWidth + 'px; height: + ' + parent.offsetHeight + 'px;';
+			}
 		};
-		
-		function myOnresize(){
-			
-		}
 
 		function canvKeyDown(e){
 			if (e.keyCode == 46){
@@ -181,10 +187,13 @@
 		function CreateGraphicObject(id){
 			if (id == 'singleRoad'){
 				var w = 200; h = 100;
-				var road = new fabric.Rect({ width: w, height: h, fill: 'black'});
+				var line1 = new fabric.Rect({ width: w, height: h/2, fill: 'black'});
+				var line2 = new fabric.Rect({ left: 0, top: h/2, width: w, height: h/2, fill: 'black'});
 				var mark = new fabric.Line([0, h/2, w, h/2], { stroke:'white', strokeWidth: 4, strokeDashArray: [20, 5] });
-				var roadGroup = new fabric.Group([road,mark],{ left: 100, top: 100 });
+				var roadGroup = new fabric.Group([line1,line2,mark],{ left: 100, top: 100 });
 				roadGroup.name = 'road' + fCanvas.getObjects().length;
+				roadGroup.type = 'asphalt';
+				roadGroup.class = 'road';
 				
 				fCanvas.add(roadGroup);
 			}
