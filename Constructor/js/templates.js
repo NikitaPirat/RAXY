@@ -2,6 +2,12 @@
  * road templates
  */
 
+function getTemplate(name){
+    if (name.indexOf('OneLineRoadIntersTwoLinesRoad')){
+        return OneLineRoadIntersTwoLinesRoad();
+    }
+}
+
 // 1 line road intersect 2 lines road
 function OneLineRoadIntersTwoLinesRoad() {
     var w = 200; h = 100;
@@ -26,5 +32,5 @@ function OneLineRoadIntersTwoLinesRoad() {
     roadGroup.obj_type = 'asphalt';
     roadGroup.obj_class = 'road';
     
-    fCanvas.add(roadGroup);
+    return roadGroup;
 }
