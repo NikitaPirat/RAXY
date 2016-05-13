@@ -23,8 +23,37 @@
 	</head>
 	<body>		
 		<div class="btn-group" style="width: 100%;">
-			<button class="btn btn-default">File</button>
-			<button class="btn btn-default">Edit</button>
+			<div class="btn-group">
+				<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+					File
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a href="#">New Fake</a></li>
+					<li><a href="#">Export Fake</a></li>
+					<li><a href="#">Import Fake</a></li>
+				</ul>
+			</div>
+			<div class="btn-group">
+				<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+					Edit
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a href="#">Undo Fake</a></li>
+					<li><a href="#">Redo Fake</a></li>
+				</ul>
+			</div>
+			<div class="btn-group">
+				<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+					Help
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a href="#">User Guide Fake</a></li>
+					<li><a href="#">About Fake</a></li>
+				</ul>
+			</div>
 		</div>
 		<div class="container-fluid">
 			<div class="row row-fullHeight">
