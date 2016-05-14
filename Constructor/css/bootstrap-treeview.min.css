@@ -1,0 +1,19 @@
+.treeview .list-group-item{
+    cursor:pointer
+}
+.treeview span.indent{
+    margin-left:10px;
+    margin-right:10px
+}
+.treeview span.icon{
+    width:12px;
+    margin-right:5px
+}
+.treeview .node-disabled{
+    color:silver;
+    cursor:not-allowed
+}
+
+.node-treeview-selectable:not(.node-disabled):hover{
+    background: rgba(0, 0, 0, 0.3);
+}
