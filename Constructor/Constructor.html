@@ -80,7 +80,7 @@
 							<div id="roadGroup" class="panel-collapse collapse">
 								<div class="panel-body">
 									<div class="btn-group-vertical" style="width: 100%;">
-										<button type="button" class="btn btn-default" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
+										<button type="button" class="btn btn-default" id="singleRoad" onclick="CreateGraphicObject('singleRoad');" onmouseup="dropElement('singleRoad')">
 											<img src="Images/singleRoad.bmp" alt="Road">
 											Дорога
 										</button>
@@ -248,6 +248,10 @@
 			if (e.keyCode == 46){
 				fCanvas.remove(fCanvas.getActiveObject());
 			}
+		}
+		
+		function dropElement(id){
+			
 		}
 
 		function CreateGraphicObject(id){
