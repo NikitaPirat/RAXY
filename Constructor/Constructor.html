@@ -61,43 +61,7 @@
 			<div class="row row-fullHeight">
 				<div id="objectsList" class="col-sm-2">
 					<div id="treeview-selectable" class="treeview">
-						<ul class="list-group">
-							<li class="list-group-item node-treeview-selectable search-result" data-nodeid="0">
-								<span class="icon expand-icon glyphicon glyphicon-minus"></span><span class="icon node-icon"></span>
-								Parent 1
-							</li>
-							<li class="list-group-item node-treeview-selectable" data-nodeid="1">
-								<span class="indent"></span>
-								<span class="icon expand-icon glyphicon glyphicon-plus"></span>
-								<span class="icon node-icon"></span>
-								Child 1
-							</li>
-							<li class="list-group-item node-treeview-selectable" data-nodeid="4">
-								<span class="indent"></span><span class="icon glyphicon"></span>
-								<span class="icon node-icon"></span>
-								Child 2
-							</li>
-							<li class="list-group-item node-treeview-selectable" data-nodeid="5">
-								<span class="icon glyphicon"></span>
-								<span class="icon node-icon"></span>
-								Parent 2
-							</li>
-							<li class="list-group-item node-treeview-selectable" data-nodeid="6">
-								<span class="icon glyphicon"></span>
-								<span class="icon node-icon"></span>
-								Parent 3
-							</li>
-							<li class="list-group-item node-treeview-selectable" data-nodeid="7">
-								<span class="icon glyphicon"></span>
-								<span class="icon node-icon"></span>
-								Parent 4
-							</li>
-							<li class="list-group-item node-treeview-selectable" data-nodeid="8">
-								<span class="icon glyphicon"></span>
-								<span class="icon node-icon"></span>
-								Parent 5
-							</li>
-						</ul>
+
 					</div>
 				</div>
 				<div id="canvasDiv" class="col-sm-8">
@@ -169,8 +133,25 @@
 			return Math.min.apply( Math, array );
 		}
 		
+		var initSelectableTree = function(d) {
+			return $('#treeview-selectable').treeview({
+				data: d,
+				multiSelect: false,
+				onNodeSelected: function(event, node) {
+					var object = getObjectByNameRec(node.text, fCanvas);
+					if (object){
+						fCanvas.setActiveObject(object);
+					}
+				},
+				onNodeUnselected: function (event, node) {
+					$('#selectable-output').prepend('<p>' + node.text + ' was unselected</p>');
+				}
+			});
+		};
+		var $selectableTree = initSelectableTree([]);
+			
 		var fCanvas;
-		window.onload = function (){
+		window.onload = function (){			
 			var oldCanvas = document.getElementById('canvas');
 			fCanvas = new fabric.Canvas('canvas', 
 			{ 
@@ -218,7 +199,6 @@
 								  {x: thisTarget.left + corners.bl.x, y: thisTarget.top + corners.bl.y},
 								  {x: thisTarget.left + corners.br.x, y: thisTarget.top + corners.br.y}]))
 							{
-								//console.log('x: ' + (thisTarget.left + corners.tl.x) + '; y: ' + (thisTarget.top + corners.tl.y)) ;
 								fCanvas.setActiveObject(obj);
 							}							
 						});
@@ -243,6 +223,12 @@
 				    	}
 					});			  	
 				}
+			});
+			fCanvas.on('object:added', function(e){
+				UpdateTreeView();
+			});
+			fCanvas.on('object:removed', function(e){
+				UpdateTreeView();
 			});
 
 			var canvasDiv = document.getElementById('canvasDiv');
@@ -269,21 +255,33 @@
 				var w = 200; h = 100;
 				var line1 = new fabric.Rect({ 
 					width: w, height: h/2, 
-					fill: 'black',
+					fill: 'black'					
+				});
+				var car = new fabric.Rect({
+					left: 10, top: 10, 
+					width: 50, height: 25, 
+					fill: 'blue',
+					name: 'car_' + (fCanvas.getObjects().length),
+					obj_class: 'car',
+					obj_type: 'simple'
+				});
+				var lineGroup1 = new fabric.Group([line1,car],{ 
+					left: 0, top: 0, 
 					name: 'line_' + fCanvas.getObjects().length,
 					obj_class: 'line',
-					obj_type: 'asphalt'
-				});
+					obj_type: 'asphalt' });
 				var line2 = new fabric.Rect({ 
-					left: 0, top: h/2, 
+					left: 0, top: 0, 
 					width: w, height: h/2, 
-					fill: 'black',
+					fill: 'black'					
+				});
+				var lineGroup2 = new fabric.Group([line2],{ 
+					left: 0, top: h/2, 
 					name: 'line_' + (fCanvas.getObjects().length+1),
 					obj_class: 'line',
-					obj_type: 'asphalt'
-				});
-				var mark = new fabric.Line([0, h/2, w, h/2], { stroke:'white', strokeWidth: 4, strokeDashArray: [20, 5] });
-				var roadGroup = new fabric.Group([line1,line2,mark],{ left: 100, top: 100 });
+					obj_type: 'asphalt' });
+				var mark = new fabric.Line([0, h/2, w, h/2], { stroke:'white', strokeWidth: 4, strokeDashArray: [20, 5], name: 'markup_' + (fCanvas.getObjects().length+1) });
+				var roadGroup = new fabric.Group([lineGroup1,lineGroup2,mark],{ left: 100, top: 100 });
 				roadGroup.name = 'road' + fCanvas.getObjects().length;
 				roadGroup.obj_type = 'asphalt';
 				roadGroup.obj_class = 'road';
@@ -307,6 +305,52 @@
 				fCanvas.add(roadGroup);
 			}
 			fCanvas.renderAll();
+		}
+		
+		function UpdateTreeView(){
+			var objects = fCanvas._objects;
+			var data = [];  
+			for (var i = 0; i < objects.length; i++){
+				if (objects[i].hasOwnProperty('obj_class') 
+					&& (objects[i].obj_class == 'road' || objects[i].obj_class == 'дорога' ||
+						objects[i].obj_class == 'cross_road' || objects[i].obj_class == 'перекресток')){
+					if (objects[i].hasOwnProperty('childs')){
+						 
+					}else{
+						if (objects[i].isType('group') && objects[i].hasOwnProperty('name') && objects[i].name.indexOf('cross_') > -1){
+							objects[i].forEachObject(function(obj){
+								
+							});
+						}else{
+							data[data.length] = getNodesFromObject(objects[i]);
+						}
+					}
+				}
+			}
+			$selectableTree = initSelectableTree(data);
+		}
+		
+		function getNodesFromObject(object){
+			if (object.hasOwnProperty('_objects') && object._objects.length > 0){
+				var result = [];
+				object.forEachObject(function(obj){
+					var node = getNodesFromObject(obj);
+					if (node){
+						result[result.length] = node;
+					}
+				});
+				if (result.length > 0){
+					return { text: object.name, href: '#' + object.name, nodes: result };
+				}else{
+					return { text: object.name, href: '#' + object.name };
+				}
+			}else{
+				if (object.hasOwnProperty('name')){
+					return { text: object.name, href: '#' + object.name, tags: ['0'] };
+				}else{
+					return false;
+				}				
+			}
 		}
 
 		function loadPattern(url, element) {
@@ -535,6 +579,8 @@
 					originX: 'center',
     				originY: 'center',
 					perPixelTargetFind: true,
+					obj_class: 'cross_road',
+					obj_type: 'asphalt'
 					//hasControls: false,
 					//hasBorders: false
 				});
@@ -557,6 +603,21 @@
   					return fCanvas._objects[i]; 
   				}
   			};
+			return false;
+		}
+		
+		function getObjectByNameRec(name, area){
+			if (area.hasOwnProperty('name') && area.name == name){
+				return area;
+			}
+			if (area.hasOwnProperty('_objects') && area._objects.length > 0){
+				var result = false;
+				var i = 0;
+				while (!result && i < area._objects.length){
+					result = getObjectByNameRec(name,area._objects[i++]);
+				}
+				return result;
+			}
 			return false;
 		}
 
@@ -597,7 +658,7 @@
 			if (object){				
 				var properties = [];
 				if (object.hasOwnProperty('obj_class')){
-					if (object.obj_class == 'road'){
+					if (object.obj_class == 'road' || object.obj_class == 'cross_road'){
 						properties = roadProperties;
 					}
 					if(object.obj_class == 'line'){
@@ -646,72 +707,5 @@
 			propList.appendChild(divRow);
 		}
 		
-		$(function() {
-
-			var defaultData = [
-			{
-				text: 'Parent 1',
-				href: '#parent1',
-				tags: ['4'],
-				nodes: [
-				{
-					text: 'Child 1',
-					href: '#child1',
-					tags: ['2'],
-					nodes: [
-					{
-						text: 'Grandchild 1',
-						href: '#grandchild1',
-						tags: ['0']
-					},
-					{
-						text: 'Grandchild 2',
-						href: '#grandchild2',
-						tags: ['0']
-					}
-					]
-				},
-				{
-					text: 'Child 2',
-					href: '#child2',
-					tags: ['0']
-				}
-				]
-			},
-			{
-				text: 'Parent 2',
-				href: '#parent2',
-				tags: ['0']
-			},
-			{
-				text: 'Parent 3',
-				href: '#parent3',
-				tags: ['0']
-			},
-			{
-				text: 'Parent 4',
-				href: '#parent4',
-				tags: ['0']
-			},
-			{
-				text: 'Parent 5',
-				href: '#parent5'  ,
-				tags: ['0']
-			}
-			];
-			var initSelectableTree = function() {
-				return $('#treeview-selectable').treeview({
-					data: defaultData,
-					multiSelect: false,
-					onNodeSelected: function(event, node) {
-						$('#selectable-output').prepend('<p>' + node.text + ' was selected</p>');
-					},
-					onNodeUnselected: function (event, node) {
-						$('#selectable-output').prepend('<p>' + node.text + ' was unselected</p>');
-					}
-				});
-			};
-			var $selectableTree = initSelectableTree();
-  		});
 	</script>
 </html>
