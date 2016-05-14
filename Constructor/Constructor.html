@@ -317,13 +317,7 @@
 					if (objects[i].hasOwnProperty('childs')){
 						 
 					}else{
-						if (objects[i].isType('group') && objects[i].hasOwnProperty('name') && objects[i].name.indexOf('cross_') > -1){
-							objects[i].forEachObject(function(obj){
-								
-							});
-						}else{
-							data[data.length] = getNodesFromObject(objects[i]);
-						}
+						data[data.length] = getNodesFromObject(objects[i]);
 					}
 				}
 			}
