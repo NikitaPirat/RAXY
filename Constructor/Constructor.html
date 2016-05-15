@@ -136,6 +136,7 @@
 		</div>
 	</body>
 	<script type="text/javascript">
+		var mousePos;
 		$('.btn').click(function() {
 			var btns = document.querySelectorAll(".btn.active");
 			[].forEach.call(btns, function(bt){
@@ -171,11 +172,15 @@
 			fCanvas = new fabric.Canvas('canvas', 
 			{ 
 				width: oldCanvas.parentNode.clientWidth, 
-				height: oldCanvas.parentNode.clientHeight
+				height: oldCanvas.parentNode.clientHeight,
+				childs: []
 			});
 			fCanvas.on('object:selected', function(options) {
 				var selectedObj = options.target;
 				showProperties(selectedObj);
+			});
+			fCanvas.on('mouse:move', function(options) {
+				mousePos = fCanvas.getPointer(options.e);
 			});
 			fCanvas.on('mouse:down', function(options) {
 				if (options.target){
@@ -227,8 +232,7 @@
 			});
 
 			fCanvas.on('object:modified', function(e) {
-				var activeObject = e.target;
-				var mousePos = fCanvas.getPointer(e);				
+				var activeObject = e.target;				
 				if (activeObject.hasOwnProperty('name') && activeObject.name.indexOf('road') == 0){
 					fCanvas.forEachObject(function(obj){				  		
 						if (obj != activeObject && obj.hasOwnProperty('name') && obj.name.indexOf('road') == 0){
@@ -239,17 +243,28 @@
 					});			  	
 				}
 				if (activeObject.hasOwnProperty('obj_class') && activeObject.obj_class != 'road'){
-					var roads = getObjectsByClass('road');
-					roads.forEach(function(road){
-						var corners = road.get('oCoords');
-						/*if (isPointInLocation(mousePos.x,mousePos.y, 
-							[ {x: corners.tl.x, y: corners.tl.y},
-								{x: corners.tr.x, y: corners.tr.y}, 
-								{x: corners.bl.x, y: corners.bl.y},
-								{x: corners.br.x, y: corners.br.y}]))
-						{*/
-							road.childs[road.childs.length] = activeObject;
-						//}		
+					var lines = getObjectsByClass('line');
+					lines.forEach(function(line){
+						if (activeObject != line){
+							if (line.containsPoint(mousePos))
+							{
+								var exists = false;
+								line.childs.forEach(function(child){
+									if (child == activeObject){
+										exists = true;
+										return;
+									}
+								});
+								if (!exists){
+									line.childs[line.childs.length] = activeObject;
+								}
+							}else{
+								var index = line.childs.indexOf(activeObject);
+								if (index > -1){
+									line.childs.splice(index, 1);
+								}
+							}
+						}
 					});
 					UpdateTreeView();
 				}
@@ -289,40 +304,43 @@
 				var w = 200; h = 100;
 				var line1 = new fabric.Rect({ 
 					width: w, height: h/2, 
-					fill: 'black'					
-				});
-				/*
-				var car = new fabric.Rect({
-					left: 10, top: 10, 
-					width: 50, height: 25, 
-					fill: 'red',
-					name: 'car_' + (fCanvas.getObjects().length),
-					obj_class: 'car',
-					obj_type: 'simple'
-				}); */
-				var lineGroup1 = new fabric.Group([line1],{ 
-					left: 0, top: 0, 
+					fill: 'black',
 					name: 'line_' + fCanvas.getObjects().length,
 					obj_class: 'line',
-					obj_type: 'asphalt' });
-				var line2 = new fabric.Rect({ 
-					left: 0, top: 0, 
-					width: w, height: h/2, 
-					fill: 'black'					
+					obj_type: 'asphalt',
+					childs: []				
 				});
-				var lineGroup2 = new fabric.Group([line2],{ 
+				fCanvas.add(line1);
+				var line2 = new fabric.Rect({ 
 					left: 0, top: h/2, 
-					name: 'line_' + (fCanvas.getObjects().length+1),
+					width: w, height: h/2, 
+					fill: 'black',
+					name: 'line_' + (fCanvas.getObjects().length),
 					obj_class: 'line',
-					obj_type: 'asphalt' });
-				var mark = new fabric.Line([0, h/2, w, h/2], { stroke:'white', strokeWidth: 4, strokeDashArray: [20, 5], name: 'markup_' + (fCanvas.getObjects().length+1) });
-				var roadGroup = new fabric.Group([lineGroup1,lineGroup2,mark],{ left: 100, top: 100 });
-				roadGroup.name = 'road' + fCanvas.getObjects().length;
-				roadGroup.obj_type = 'asphalt';
-				roadGroup.obj_class = 'road';
-				roadGroup.childs = [];
-				
-				fCanvas.add(roadGroup);
+					obj_type: 'asphalt',
+					childs: []						
+				});
+				fCanvas.add(line2);
+				var mark = new fabric.Line([0, h/2-1, w, h/2-1], { 
+					stroke:'white', 
+					strokeWidth: 3, 
+					strokeDashArray: [20, 5], 
+					name: 'markup_' + (fCanvas.getObjects().length),
+					obj_class: 'markup',
+					obj_type: 'separate',
+					childs: [] 
+				});				
+				fCanvas.add(mark);
+				var road = new fabric.Rect({ 
+					width: w, height: h, 
+					name: 'road_' + (fCanvas.getObjects().length),
+					obj_class: 'road',
+					obj_type: 'asphalt',
+					childs: [line1,line2,mark]						
+				});
+				fCanvas.childs[fCanvas.childs.length] = road;
+				fCanvas.add(road);
+				fCanvas.sendToBack(road);				
 			}
 			if (id == 'crossRoad'){
 				var hr = 20; var crSize = 100;
@@ -358,33 +376,25 @@
 		}
 		
 		function UpdateTreeView(){
-			var objects = fCanvas._objects;
+			var childs = fCanvas.childs;
 			var data = [];  
-			for (var i = 0; i < objects.length; i++){
-				if (objects[i].hasOwnProperty('obj_class')) {
-					data[data.length] = getNodesFromObject(objects[i]);
+			for (var i = 0; i < childs.length; i++){
+				if (childs[i].hasOwnProperty('obj_class')) {
+					data[data.length] = getNodesFromObject(childs[i]);
 				}
 			}
 			$selectableTree = initSelectableTree(data);
 		}
 		
 		function getNodesFromObject(object){
-			if (object.hasOwnProperty('_objects') && object._objects.length > 0){
+			if (object.hasOwnProperty('childs') && object.childs.length > 0){
 				var result = [];
-				object.forEachObject(function(obj){
-					var node = getNodesFromObject(obj);
+				object.childs.forEach(function(child){
+					var node = getNodesFromObject(child);
 					if (node){
 						result[result.length] = node;
 					}
-				});
-				if (object.hasOwnProperty('childs') && object.childs.length > 0){
-					object.childs.forEach(function(child){
-						var node = getNodesFromObject(child);
-						if (node){
-							result[result.length] = node;
-						}
-					});
-				}
+				});				
 				if (result.length > 0){
 					return { text: object.name, href: '#' + object.name, nodes: result };
 				}else{
@@ -397,6 +407,7 @@
 					return false;
 				}				
 			}
+			return false;
 		}
 
 		function loadPattern(url, element) {
