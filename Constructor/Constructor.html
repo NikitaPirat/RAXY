@@ -110,6 +110,21 @@
 									</div>
 								</div>
 							</div>
+						</div>	
+						<div class="panel panel-default">
+							<a class="btn btn-default" data-toggle="collapse" data-parent="#toolboxContent" href="#carGroup" style="width:100%">
+								Transport
+							</a>
+							<div id="carGroup" class="panel-collapse collapse">
+								<div class="panel-body">
+									<div class="btn-group-vertical" style="width: 100%;">
+										<button type="button" class="btn btn-default" id="car" onclick="CreateGraphicObject('car');">
+											<img src="Images/singleRoad.bmp" alt="Road">
+											Car
+										</button>
+									</div>
+								</div>
+							</div>
 						</div>									
 					</div>	
 					<div id="propertiesContent">
@@ -161,8 +176,6 @@
 			fCanvas.on('object:selected', function(options) {
 				var selectedObj = options.target;
 				showProperties(selectedObj);
-				//document.getElementById("property_name_input").value = selectedObj.name;
-				//console.log(selectedObj.name) ;
 			});
 			fCanvas.on('mouse:down', function(options) {
 				if (options.target){
@@ -208,20 +221,37 @@
 				}
 			});
 			fCanvas.on('object:moving', function(e) {
-				//removeObjectByNameParts(['cross_', e.target.name]);
+				if (e.target.hasOwnProperty('obj_class') && e.target.obj_class != 'road'){
+					fCanvas.bringToFront(e.target);
+				}
 			});
 
 			fCanvas.on('object:modified', function(e) {
 				var activeObject = e.target;
+				var mousePos = fCanvas.getPointer(e);				
 				if (activeObject.hasOwnProperty('name') && activeObject.name.indexOf('road') == 0){
 					fCanvas.forEachObject(function(obj){				  		
 						if (obj != activeObject && obj.hasOwnProperty('name') && obj.name.indexOf('road') == 0){
 							var objCorners = obj.get('oCoords');
 							var actCorners = activeObject.get('oCoords');						
-							//removeObjectByNameParts(['cross_', activeObject.name, obj.name]);
 				    		createCrossRoad(objCorners, actCorners, {aName: activeObject.name, oName: obj.name});					    		
 				    	}
 					});			  	
+				}
+				if (activeObject.hasOwnProperty('obj_class') && activeObject.obj_class != 'road'){
+					var roads = getObjectsByClass('road');
+					roads.forEach(function(road){
+						var corners = road.get('oCoords');
+						/*if (isPointInLocation(mousePos.x,mousePos.y, 
+							[ {x: corners.tl.x, y: corners.tl.y},
+								{x: corners.tr.x, y: corners.tr.y}, 
+								{x: corners.bl.x, y: corners.bl.y},
+								{x: corners.br.x, y: corners.br.y}]))
+						{*/
+							road.childs[road.childs.length] = activeObject;
+						//}		
+					});
+					UpdateTreeView();
 				}
 			});
 			fCanvas.on('object:added', function(e){
@@ -261,6 +291,7 @@
 					width: w, height: h/2, 
 					fill: 'black'					
 				});
+				/*
 				var car = new fabric.Rect({
 					left: 10, top: 10, 
 					width: 50, height: 25, 
@@ -268,8 +299,8 @@
 					name: 'car_' + (fCanvas.getObjects().length),
 					obj_class: 'car',
 					obj_type: 'simple'
-				});
-				var lineGroup1 = new fabric.Group([line1,car],{ 
+				}); */
+				var lineGroup1 = new fabric.Group([line1],{ 
 					left: 0, top: 0, 
 					name: 'line_' + fCanvas.getObjects().length,
 					obj_class: 'line',
@@ -289,6 +320,7 @@
 				roadGroup.name = 'road' + fCanvas.getObjects().length;
 				roadGroup.obj_type = 'asphalt';
 				roadGroup.obj_class = 'road';
+				roadGroup.childs = [];
 				
 				fCanvas.add(roadGroup);
 			}
@@ -308,6 +340,20 @@
 				
 				fCanvas.add(roadGroup);
 			}
+			if (id == 'car'){
+				var car = new fabric.Rect({
+					left: 0, top: 0, 
+					width: 50, height: 25, 
+					fill: 'red'
+				});
+				var carGroup = new fabric.Group([car],{ 
+					left: 100, top: 100, 
+					name: 'car_' + fCanvas.getObjects().length,
+					obj_class: 'car',
+					obj_type: 'simple'
+				});
+				fCanvas.add(carGroup);
+			}
 			fCanvas.renderAll();
 		}
 		
@@ -315,14 +361,8 @@
 			var objects = fCanvas._objects;
 			var data = [];  
 			for (var i = 0; i < objects.length; i++){
-				if (objects[i].hasOwnProperty('obj_class') 
-					&& (objects[i].obj_class == 'road' || objects[i].obj_class == 'дорога' ||
-						objects[i].obj_class == 'cross_road' || objects[i].obj_class == 'перекресток')){
-					if (objects[i].hasOwnProperty('childs')){
-						 
-					}else{
-						data[data.length] = getNodesFromObject(objects[i]);
-					}
+				if (objects[i].hasOwnProperty('obj_class')) {
+					data[data.length] = getNodesFromObject(objects[i]);
 				}
 			}
 			$selectableTree = initSelectableTree(data);
@@ -337,6 +377,14 @@
 						result[result.length] = node;
 					}
 				});
+				if (object.hasOwnProperty('childs') && object.childs.length > 0){
+					object.childs.forEach(function(child){
+						var node = getNodesFromObject(child);
+						if (node){
+							result[result.length] = node;
+						}
+					});
+				}
 				if (result.length > 0){
 					return { text: object.name, href: '#' + object.name, nodes: result };
 				}else{
@@ -478,14 +526,16 @@
   					top: minPoint.y,
   					fill: 'black',
 					name: 'cross_' + names.aName + '_' + names.oName,
-					perPixelTargetFind: true//,
+					perPixelTargetFind: true,
+					obj_class: 'cross_road',
+					obj_type: 'asphalt' //,
 					//hasControls: false,
 					//hasBorders: false
   				});
     		var crossObjects = [];
     		//fCanvas.add(crossRoad);
 			crossObjects[0] = crossRoad;
-			var partName = 'road_' + names.aName + '_' + names.oName;
+			var partName = 'road';
 			// aToT aBoT
 			if (corner1.hasOwnProperty('p1') || corner3.hasOwnProperty('p1')){
 				var dirPoint;
@@ -500,7 +550,9 @@
 						top: Math.min(corner1.p4.y, corner3.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
 						name: partName + '_actRoadPartObj1',
-						perPixelTargetFind: true//,
+						perPixelTargetFind: true,
+						obj_class: 'road',
+						obj_type: 'asphalt'//,
 						//hasControls: false,
 						//hasBorders: false
 					});
@@ -521,7 +573,9 @@
 						top: Math.min(corner2.p4.y, corner4.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
 						name: partName + '_actRoadPartObj2',
-						perPixelTargetFind: true//,
+						perPixelTargetFind: true,
+						obj_class: 'road',
+						obj_type: 'asphalt'//,
 						//hasControls: false,
 						//hasBorders: false
 					});
@@ -542,7 +596,9 @@
 						top: Math.min(corner1.p4.y, corner2.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
 						name: partName + '_actRoadPartObj3',
-						perPixelTargetFind: true//,
+						perPixelTargetFind: true,
+						obj_class: 'road',
+						obj_type: 'asphalt'//,
 						//hasControls: false,
 						//hasBorders: false
 					});
@@ -563,7 +619,9 @@
 						top: Math.min(corner3.p4.y, corner4.p4.y, dirPoint1.y, dirPoint2.y),
 						fill: 'black',
 						name: partName + '_actRoadPartObj4',
-						perPixelTargetFind: true//,
+						perPixelTargetFind: true,
+						obj_class: 'road',
+						obj_type: 'asphalt'//,
 						//hasControls: false,
 						//hasBorders: false
 					});
@@ -595,13 +653,7 @@
   		}
 		  
 		function getObjectByName(name){
-			for (var i = 0; i < fCanvas._objects.length; i++){
-  				if (fCanvas._objects[i].hasOwnProperty('name') && fCanvas._objects[i].name == name) 
-  				{ 
-  					return fCanvas._objects[i]; 
-  				}
-  			};
-			return false;
+			return getObjectByNameRec(name, fCanvas);
 		}
 		
 		function getObjectByNameRec(name, area){
@@ -617,6 +669,24 @@
 				return result;
 			}
 			return false;
+		}
+		
+		function getObjectsByClass(c){
+			var result = [];
+			return getObjectsByClassRec(c, fCanvas, result);
+		}
+		
+		function getObjectsByClassRec(c, area, result){
+			if (area.hasOwnProperty('obj_class') && area.obj_class == c){
+				result[result.length] = area;
+			}else{
+				if (area.hasOwnProperty('_objects') && area._objects.length > 0){
+					for (var i = 0; i < area._objects.length; i++){
+						getObjectsByClassRec(c,area._objects[i], result);
+					}
+				}
+			}
+			return result;
 		}
 
 		// array []
@@ -661,6 +731,9 @@
 					}
 					if(object.obj_class == 'line'){
 						properties = lineProperties;
+					}
+					if (object.obj_class == 'car'){
+						properties = carProperties;
 					}
 					for(var i = 0; i < properties.length; i++){
 						var val = '';
