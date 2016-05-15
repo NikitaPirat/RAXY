@@ -260,7 +260,7 @@
 				var car = new fabric.Rect({
 					left: 10, top: 10, 
 					width: 50, height: 25, 
-					fill: 'blue',
+					fill: 'red',
 					name: 'car_' + (fCanvas.getObjects().length),
 					obj_class: 'car',
 					obj_type: 'simple'
@@ -686,6 +686,9 @@
 			inpEl.value = val;
 			inpEl.onchange = function (){
 				fCanvas.getActiveObject()[name] = inpEl.value;
+				if (inpEl.id == 'name_input'){
+					UpdateTreeView();
+				}				
 			};
 			
 			var col8 = document.createElement('div');
