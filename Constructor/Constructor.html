@@ -199,7 +199,6 @@
 								  {x: thisTarget.left + corners.bl.x, y: thisTarget.top + corners.bl.y},
 								  {x: thisTarget.left + corners.br.x, y: thisTarget.top + corners.br.y}]))
 							{
-								//console.log('x: ' + (thisTarget.left + corners.tl.x) + '; y: ' + (thisTarget.top + corners.tl.y)) ;
 								fCanvas.setActiveObject(obj);
 							}							
 						});
@@ -226,13 +225,14 @@
 				}
 			});
 			fCanvas.on('object:moving', function(e) {
-				if (e.target.hasOwnProperty('obj_class') && e.target.obj_class != 'road'){
+				if (e.target.hasOwnProperty('obj_class') && 
+					(e.target.obj_class != 'road' && e.target.obj_class != 'line')){
 					fCanvas.bringToFront(e.target);
 				}
 			});
 
 			fCanvas.on('object:modified', function(e) {
-				var activeObject = e.target;				
+				var activeObject = e.target;						
 				if (activeObject.hasOwnProperty('name') && activeObject.name.indexOf('road') == 0){
 					fCanvas.forEachObject(function(obj){				  		
 						if (obj != activeObject && obj.hasOwnProperty('name') && obj.name.indexOf('road') == 0){
@@ -266,6 +266,7 @@
 							}
 						}
 					});
+					var test = getChildObjects(fCanvas.childs[0]);
 					UpdateTreeView();
 				}
 			});
@@ -368,11 +369,27 @@
 					left: 100, top: 100, 
 					name: 'car_' + fCanvas.getObjects().length,
 					obj_class: 'car',
-					obj_type: 'simple'
+					obj_type: 'simple',
+					childs: []
 				});
 				fCanvas.add(carGroup);
 			}
 			fCanvas.renderAll();
+		}
+		
+		function getChildObjects(object){
+			result = [];
+			return getChildObjectsRec(object, result);
+		}
+		
+		function getChildObjectsRec(object, result){
+			if (object.hasOwnProperty('childs')){
+				result[result.length] = object;
+				for (var i = 0; i < object.childs.length; i++){
+					getChildObjectsRec(object.childs[i], result);
+				}
+			}
+			return result;
 		}
 		
 		function UpdateTreeView(){
