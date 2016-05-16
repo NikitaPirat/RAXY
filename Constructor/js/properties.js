@@ -1,3 +1,4 @@
-var roadProperties = ['name', 'obj_class', 'obj_type', 'lines', 'marking'];
-var lineProperties = ['name', 'obj_class', 'obj_type', 'left', 'right'];
-var carProperties = ['name', 'obj_class', 'obj_type', 'number', 'right direction indicator', 'left direction indicator'];
+var sharedProperties = [ 'name', 'obj_class', 'obj_type']
+var roadProperties = [ 'lines', 'marking'];
+var lineProperties = ['left', 'right'];
+var carProperties = ['number', 'right direction indicator', 'left direction indicator'];

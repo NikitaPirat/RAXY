@@ -13,8 +13,10 @@
 	<!-- bootstrap -->	
 	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css"/>
 	<link rel="stylesheet" href="css/bootstrap-treeview.min.css" type="text/css"/>
+	<link rel="stylesheet" href="css/bootstrap-combobox.css" type="text/css"/>
 	<script src="js/bootstrap.min.js" type="text/javascript"></script>
 	<script src="js/bootstrap-treeview.min.js" type="text/javascript"></script>
+	<script src="js/bootstrap-combobox.js" type="text/javascript"></script>
 	
 	<!-- my scripts and stylesheets -->	
 	<link rel="stylesheet" href="ConstructorStyles.css" type="text/css"/>	
@@ -300,6 +302,7 @@
 		}
 
 		function CreateGraphicObject(id){
+			// maybe do not use graphic objects for some situation objects (f.e. lines could be a 'virtual' objects)
 			if (id == 'singleRoad'){
 				var w = 200; h = 100;
 				var line1 = new fabric.Rect({ 
@@ -310,17 +313,17 @@
 					obj_type: 'asphalt',
 					childs: []				
 				});
-				fCanvas.add(line1);
+				//fCanvas.add(line1);
 				var line2 = new fabric.Rect({ 
 					left: 0, top: h/2, 
 					width: w, height: h/2, 
 					fill: 'black',
-					name: 'line_' + (fCanvas.getObjects().length),
+					name: 'line_' + (fCanvas.getObjects().length+1),
 					obj_class: 'line',
 					obj_type: 'asphalt',
 					childs: []						
 				});
-				fCanvas.add(line2);
+				//fCanvas.add(line2);
 				var mark = new fabric.Line([0, h/2-1, w, h/2-1], { 
 					stroke:'white', 
 					strokeWidth: 3, 
@@ -333,14 +336,20 @@
 				fCanvas.add(mark);
 				var road = new fabric.Rect({ 
 					width: w, height: h, 
+										
+				});
+				// using child-parent concept,  
+				var roadGroup = new fabric.Group([line1,line2,road],
+				{ 
+					left: 0, top: 0, 
 					name: 'road_' + (fCanvas.getObjects().length),
 					obj_class: 'road',
 					obj_type: 'asphalt',
-					childs: [line1,line2,mark]						
+					childs: [line1,line2,mark]	 
 				});
-				fCanvas.childs[fCanvas.childs.length] = road;
-				fCanvas.add(road);
-				fCanvas.sendToBack(road);				
+				fCanvas.childs[fCanvas.childs.length] = roadGroup;
+				fCanvas.add(roadGroup);
+				fCanvas.sendToBack(roadGroup);				
 			}
 			if (id == 'crossRoad'){
 				var hr = 20; var crSize = 100;
@@ -370,6 +379,7 @@
 					obj_class: 'car',
 					obj_type: 'simple'
 				});
+				fCanvas.childs[fCanvas.childs.length] = carGroup;
 				fCanvas.add(carGroup);
 			}
 			fCanvas.renderAll();
@@ -735,29 +745,36 @@
 			}
 			
 			if (object){				
-				var properties = [];
+				
+				addProperty("related_to", "" , "cmb", fCanvas.getObjects());
+				//$('.combobox').combobox()
+				var properties = sharedProperties.slice();
 				if (object.hasOwnProperty('obj_class')){
 					if (object.obj_class == 'road' || object.obj_class == 'cross_road'){
-						properties = roadProperties;
+						Array.prototype.push.apply(properties, roadProperties);
 					}
 					if(object.obj_class == 'line'){
-						properties = lineProperties;
+						Array.prototype.push.apply(properties, lineProperties);
 					}
 					if (object.obj_class == 'car'){
-						properties = carProperties;
+						Array.prototype.push.apply(properties, carProperties);
 					}
 					for(var i = 0; i < properties.length; i++){
 						var val = '';
 						if (object.hasOwnProperty(properties[i])){
 							val = object[properties[i]];
 						}
-						addProperty(properties[i], val);
+						addProperty(properties[i], val, "input", []);
 					}
 				}
 			}
   		}
-		  
-		function addProperty(name, val){
+		
+		function getParent(object){
+			
+		}
+		
+		function addProperty(name, val, type, list){
 			var txtEl = document.createElement("p");
 			txtEl.style="padding: 7px; margin-right: 5px;";
 			var txtNode = document.createTextNode(name);
@@ -767,17 +784,39 @@
 			col4.className = "col-sm-4";
 			col4.appendChild(txtEl);
 			
-			var inpEl = document.createElement("input");
-			inpEl.id = name + "_input";
-			inpEl.type="text";
-			inpEl.className="form-control";
-			inpEl.value = val;
-			inpEl.onchange = function (){
-				fCanvas.getActiveObject()[name] = inpEl.value;
-				if (inpEl.id == 'name_input'){
-					UpdateTreeView();
-				}				
-			};
+			var inpEl;
+			if (type == "input"){
+				inpEl = document.createElement("input");
+				inpEl.id = name + "_input";
+				inpEl.type="text";
+				inpEl.className="form-control";
+				inpEl.value = val;
+				inpEl.onchange = function (){
+					fCanvas.getActiveObject()[name] = inpEl.value;
+					if (inpEl.id == 'name_input'){
+						UpdateTreeView();
+					}				
+				};
+			}
+			if (type == "cmb"){
+				inpEl = document.createElement("select");
+				inpEl.id = name + "_cmb";
+				inpEl.className="combobox";
+				inpEl.value = val;
+				inpEl.onchange = function (){
+					fCanvas.getActiveObject()[name] = inpEl.value;
+					if (inpEl.id == 'name_input'){
+						UpdateTreeView();
+					}				
+				};
+				list.forEach(function(o){
+					var option = document.createElement("option");
+					option.value = o.name;
+					var txt = document.createTextNode(o.name);
+					option.appendChild(txt);
+					inpEl.appendChild(option);
+				});
+			}
 			
 			var col8 = document.createElement('div');
 			col8.className = "col-sm-8";
