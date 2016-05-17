@@ -13,10 +13,10 @@
 	<!-- bootstrap -->	
 	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css"/>
 	<link rel="stylesheet" href="css/bootstrap-treeview.min.css" type="text/css"/>
-	<link rel="stylesheet" href="css/bootstrap-combobox.css" type="text/css"/>
+	<link rel="stylesheet" href="css/combobox/select2-bootstrap.min.css" type="text/css"/>
 	<script src="js/bootstrap.min.js" type="text/javascript"></script>
 	<script src="js/bootstrap-treeview.min.js" type="text/javascript"></script>
-	<script src="js/bootstrap-combobox.js" type="text/javascript"></script>
+	<script src="js/combobox/select2.full.min.js" type="text/javascript"></script>
 	
 	<!-- my scripts and stylesheets -->	
 	<link rel="stylesheet" href="ConstructorStyles.css" type="text/css"/>	
@@ -761,10 +761,9 @@
 				myNode.removeChild(myNode.firstChild);
 			}
 			
-			if (object){				
-				
-				addProperty("related_to", "" , "cmb", fCanvas.getObjects());
-				//$('.combobox').combobox()
+			if (object){								
+				addProperty("related_to", "" , "cmb", fCanvas.getObjects());	
+				initCmb();			
 				var properties = sharedProperties.slice();
 				if (object.hasOwnProperty('obj_class')){
 					if (object.obj_class == 'road' || object.obj_class == 'cross_road'){
@@ -818,7 +817,7 @@
 			if (type == "cmb"){
 				inpEl = document.createElement("select");
 				inpEl.id = name + "_cmb";
-				inpEl.className="combobox";
+				inpEl.className="js-example-basic-single js-states form-control select2-hidden-accessible";
 				inpEl.value = val;
 				inpEl.onchange = function (){
 					fCanvas.getActiveObject()[name] = inpEl.value;
@@ -848,5 +847,8 @@
 			propList.appendChild(divRow);
 		}
 		
+		function initCmb(){
+			$(".js-example-basic-single js-states form-control select2-hidden-accessible").select2();
+		}
 	</script>
 </html>
