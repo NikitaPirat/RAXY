@@ -818,7 +818,7 @@
 			}
 			
 			if (object){								
-				addProperty("parent", object.parent , "cmb", getChildObjects(fCanvas));	
+				addProperty({name:"parent",text:"parent"}, object.parent , "cmb", getChildObjects(fCanvas));	
 				initCmb();			
 				var properties = sharedProperties.slice();
 				if (object.hasOwnProperty('obj_class')){
@@ -833,8 +833,8 @@
 					}
 					for(var i = 0; i < properties.length; i++){
 						var val = '';
-						if (object.hasOwnProperty(properties[i])){
-							val = object[properties[i]];
+						if (object.hasOwnProperty(properties[i].name)){
+							val = object[properties[i].name];
 						}
 						addProperty(properties[i], val, "input", []);
 					}
@@ -865,10 +865,10 @@
 			return result;
 		}
 		
-		function addProperty(name, val, type, list){
+		function addProperty(prop, val, type, list){
 			var txtEl = document.createElement("p");
 			txtEl.style="padding: 7px; margin-right: 5px;";
-			var txtNode = document.createTextNode(name);
+			var txtNode = document.createTextNode(prop.text);
 			txtEl.appendChild(txtNode);		
 			
 			var col4 = document.createElement('div');
@@ -878,12 +878,12 @@
 			var inpEl;
 			if (type == "input"){
 				inpEl = document.createElement("input");
-				inpEl.id = name + "_input";
+				inpEl.id = prop.name + "_input";
 				inpEl.type="text";
 				inpEl.className="form-control";
 				inpEl.value = val;
 				inpEl.onchange = function (){
-					fCanvas.getActiveObject()[name] = inpEl.value;
+					fCanvas.getActiveObject()[prop.name] = inpEl.value;
 					if (inpEl.id == 'name_input'){
 						UpdateTreeView();
 					}				
@@ -891,7 +891,7 @@
 			}
 			if (type == "cmb"){
 				inpEl = document.createElement("select");
-				inpEl.id = name + "_cmb";
+				inpEl.id = prop.name + "_cmb";
 				inpEl.className="js-example-basic-single js-states form-control select2-hidden-accessible";
 				inpEl.onchange = function (){
 					var activeObj = fCanvas.getActiveObject();
@@ -911,7 +911,7 @@
 					}else{
 						newParent = fCanvas;
 					}
-					activeObj[name] = newParent;	
+					activeObj[prop.name] = newParent;	
 					if (!newParent.hasOwnProperty('childs')){
 						newParent.childs = [];
 					}				
