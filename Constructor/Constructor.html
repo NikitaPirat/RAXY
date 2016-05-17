@@ -178,11 +178,10 @@
 				childs: []
 			});
 			fCanvas.on('object:selected', function(options) {
-				var selectedObj = options.target;
-				showProperties(selectedObj);
+				showProperties(options.target);
 			});
 			fCanvas.on('mouse:move', function(options) {
-				mousePos = fCanvas.getPointer(options.e);
+				mousePos = fCanvas.getPointer(options.e);				
 			});
 			fCanvas.on('mouse:down', function(options) {
 				if (options.target){
@@ -273,6 +272,15 @@
 				}
 			});
 			fCanvas.on('object:added', function(e){
+				if (!e.target.hasOwnProperty('parent')){
+					e.target.parent = '';
+				}
+				if (!e.target.hasOwnProperty('childs')){
+					e.target.childs = [];
+				}
+				if (e.target.parent == '' && fCanvas.childs.indexOf(e.target) == -1){
+					fCanvas.childs[fCanvas.childs.length] = e.target;
+				}
 				UpdateTreeView();
 			});
 			fCanvas.on('object:removed', function(e){
@@ -352,8 +360,7 @@
 					obj_class: 'markup',
 					obj_type: 'separate',
 					childs: [] 
-				});				
-				fCanvas.add(mark);
+				});								
 				var road = new fabric.Rect({ 
 					width: w, height: h, 
 										
@@ -369,6 +376,7 @@
 					parent: ""	 
 				});
 				mark.parent = line2.parent = line1.parent = roadGroup;
+				fCanvas.add(mark);
 				fCanvas.childs[fCanvas.childs.length] = roadGroup;
 				fCanvas.add(roadGroup);
 				fCanvas.sendToBack(roadGroup);				
@@ -416,7 +424,7 @@
 					obj_class: 'markup',
 					obj_type: 'separate',
 					childs: [],
-					parent: "" 
+					parent: ''
 				});				
 				fCanvas.childs[fCanvas.childs.length] = mark;
 				fCanvas.add(mark);				
@@ -603,7 +611,8 @@
 					name: 'cross_' + names.aName + '_' + names.oName,
 					perPixelTargetFind: true,
 					obj_class: 'cross_road',
-					obj_type: 'asphalt' //,
+					obj_type: 'asphalt',
+					childs: []  //,
 					//hasControls: false,
 					//hasBorders: false
   				});
@@ -627,7 +636,8 @@
 						name: partName + '_actRoadPartObj1',
 						perPixelTargetFind: true,
 						obj_class: 'road',
-						obj_type: 'asphalt'//,
+						obj_type: 'asphalt',
+						childs: [] //,
 						//hasControls: false,
 						//hasBorders: false
 					});
@@ -650,7 +660,8 @@
 						name: partName + '_actRoadPartObj2',
 						perPixelTargetFind: true,
 						obj_class: 'road',
-						obj_type: 'asphalt'//,
+						obj_type: 'asphalt',
+						childs: [] //,
 						//hasControls: false,
 						//hasBorders: false
 					});
@@ -673,7 +684,8 @@
 						name: partName + '_actRoadPartObj3',
 						perPixelTargetFind: true,
 						obj_class: 'road',
-						obj_type: 'asphalt'//,
+						obj_type: 'asphalt',
+						childs: [] //,
 						//hasControls: false,
 						//hasBorders: false
 					});
@@ -696,14 +708,15 @@
 						name: partName + '_actRoadPartObj4',
 						perPixelTargetFind: true,
 						obj_class: 'road',
-						obj_type: 'asphalt'//,
+						obj_type: 'asphalt',
+						childs: [] //,
 						//hasControls: false,
 						//hasBorders: false
 					});
 				//fCanvas.add(actRoadPartObj4);
 				crossObjects[crossObjects.length] = actRoadPartObj4;
 			}
-			removeObjectByName(names.aName); removeObjectByName(names.oName);
+			removeObjectByName(names.aName); removeObjectByName(names.oName);			
 			var roadGroup = new fabric.Group(crossObjects, 
 				{
 					name: 'cross_' + fCanvas.getObjects().length,
@@ -711,10 +724,15 @@
     				originY: 'center',
 					perPixelTargetFind: true,
 					obj_class: 'cross_road',
-					obj_type: 'asphalt'
+					obj_type: 'asphalt',
+					childs: crossObjects,
+					parent: ''
 					//hasControls: false,
 					//hasBorders: false
-				});
+				});			
+			crossObjects.forEach(function(obj){
+				obj.parent = roadGroup;
+			});
 			fCanvas.add(roadGroup);
   		}
 
