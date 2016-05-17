@@ -101,13 +101,13 @@
 							<div id="markGroup" class="panel-collapse collapse">
 								<div class="panel-body">
 									<div class="btn-group-vertical" style="width: 100%;">
-										<button type="button" class="btn btn-default" id="singleRoad" onclick="CreateGraphicObject('singleRoad');">
-											<img src="Images/singleRoad.bmp" alt="Road">
-											Дорога
+										<button type="button" class="btn btn-default" id="single_dotted_markup" onclick="CreateGraphicObject('single_dotted_markup');">
+											<!--<img src="Images/singleRoad.bmp" alt="Road">-->
+											Single Dotted
 										</button>
 										<button type="button" class="btn btn-default" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
-											<img src="Images/singleRoad.bmp" alt="Road">
-											Перекресток
+											<!--<img src="Images/singleRoad.bmp" alt="Road">-->
+											Single Solid (fake)
 										</button>
 									</div>
 								</div>
@@ -276,6 +276,25 @@
 				UpdateTreeView();
 			});
 			fCanvas.on('object:removed', function(e){
+				var removedObj = e.target;
+				var childs = getChildObjects(removedObj);
+				childs.forEach(function(child){
+					fCanvas.remove(child);
+				});
+				var oldParent;
+				if (removedObj.hasOwnProperty('parent') && removedObj.parent != ''){
+					if (removedObj.parent.hasOwnProperty('name')){
+						oldParent = removedObj.parent;
+					}else{
+						oldParent = getObjectByName(removedObj.parent);						
+					}						
+				}else{
+					oldParent = fCanvas;
+				}
+				var index = oldParent.childs.indexOf(removedObj);
+				if (index > -1){
+					oldParent.childs.splice(index, 1);
+				}
 				UpdateTreeView();
 			});
 
@@ -386,6 +405,21 @@
 				});
 				fCanvas.childs[fCanvas.childs.length] = carGroup;
 				fCanvas.add(carGroup);
+			}
+			if (id == 'single_dotted_markup'){
+				var w = 200; h = 100;
+				var mark = new fabric.Line([0, h/2-1, w, h/2-1], { 
+					stroke:'white', 
+					strokeWidth: 3, 
+					strokeDashArray: [20, 5], 
+					name: 'markup_' + (fCanvas.getObjects().length),
+					obj_class: 'markup',
+					obj_type: 'separate',
+					childs: [],
+					parent: "" 
+				});				
+				fCanvas.childs[fCanvas.childs.length] = mark;
+				fCanvas.add(mark);				
 			}
 			fCanvas.renderAll();
 		}
@@ -853,7 +887,6 @@
 					if (index > -1){
 						oldParent.childs.splice(index, 1);
 					}
-					UpdateTreeView();
 					var newParent;
 					if (this.value != "empty"){
 						newParent = getObjectByName(inpEl.value);
