@@ -346,8 +346,10 @@
 					name: 'road_' + (fCanvas.getObjects().length),
 					obj_class: 'road',
 					obj_type: 'asphalt',
-					childs: [line1,line2,mark]	 
+					childs: [line1,line2,mark],
+					parent: ""	 
 				});
+				mark.parent = line2.parent = line1.parent = roadGroup;
 				fCanvas.childs[fCanvas.childs.length] = roadGroup;
 				fCanvas.add(roadGroup);
 				fCanvas.sendToBack(roadGroup);				
@@ -379,7 +381,8 @@
 					name: 'car_' + fCanvas.getObjects().length,
 					obj_class: 'car',
 					obj_type: 'simple',
-					childs: []
+					childs: [],
+					parent: ""
 				});
 				fCanvas.childs[fCanvas.childs.length] = carGroup;
 				fCanvas.add(carGroup);
@@ -753,6 +756,7 @@
   		}
 
   		function showProperties(object){
+			if (!object.hasOwnProperty('name')) { return; }
   			document.getElementById('toolboxContent').style.display = "none";
   			document.getElementById('propertiesContent').style.display = "block";
 			// clear properties
@@ -762,7 +766,7 @@
 			}
 			
 			if (object){								
-				addProperty("related_to", "" , "cmb", fCanvas.getObjects());	
+				addProperty("parent", object.parent , "cmb", getChildObjects(fCanvas));	
 				initCmb();			
 				var properties = sharedProperties.slice();
 				if (object.hasOwnProperty('obj_class')){
@@ -786,8 +790,27 @@
 			}
   		}
 		
-		function getParent(object){
-			
+		function getAllObjects(){
+			result = [];
+			fCanvas.forEachObject(function(o){
+				Array.prototype.push.apply(result, getAllObjectsRec(o, []));
+			});
+			return result;
+		}
+		
+		function getAllObjectsRec(area, result){
+			if (!area.hasOwnProperty('_objects') ||
+				area.hasOwnProperty('_objects') && area._objects.length == 0)
+			{
+				result[result.length] = area;
+			}else{
+				if (area.hasOwnProperty('_objects') && area._objects.length > 0){
+					for (var i = 0; i < area._objects.length; i++){
+						getAllObjectsRec(area._objects[i], result);
+					}
+				}
+			}
+			return result;
 		}
 		
 		function addProperty(name, val, type, list){
@@ -818,20 +841,55 @@
 				inpEl = document.createElement("select");
 				inpEl.id = name + "_cmb";
 				inpEl.className="js-example-basic-single js-states form-control select2-hidden-accessible";
-				inpEl.value = val;
 				inpEl.onchange = function (){
-					fCanvas.getActiveObject()[name] = inpEl.value;
-					if (inpEl.id == 'name_input'){
-						UpdateTreeView();
+					var activeObj = fCanvas.getActiveObject();
+					var oldParent;
+					if (this.oldvalue != "empty"){
+						oldParent = getObjectByName(this.oldvalue);						
+					}else{
+						oldParent = fCanvas;
+					}
+					var index = oldParent.childs.indexOf(activeObj);
+					if (index > -1){
+						oldParent.childs.splice(index, 1);
+					}
+					UpdateTreeView();
+					var newParent;
+					if (this.value != "empty"){
+						newParent = getObjectByName(inpEl.value);
+					}else{
+						newParent = fCanvas;
+					}
+					activeObj[name] = newParent;	
+					if (!newParent.hasOwnProperty('childs')){
+						newParent.childs = [];
 					}				
+					newParent.childs[newParent.childs.length] = activeObj;
+					this.oldvalue = this.value;						
+					UpdateTreeView();
 				};
+				inpEl.onfocus = function(){
+					this.oldvalue = this.value;	
+				};
+				var option = document.createElement("option");
+				option.value = "empty";
+				var txt = document.createTextNode("");
+				option.appendChild(txt);
+				inpEl.appendChild(option);
 				list.forEach(function(o){
-					var option = document.createElement("option");
-					option.value = o.name;
-					var txt = document.createTextNode(o.name);
-					option.appendChild(txt);
-					inpEl.appendChild(option);
+					if (o.hasOwnProperty('name')){
+						var option = document.createElement("option");
+						option.value = o.name;
+						var txt = document.createTextNode(o.name);
+						option.appendChild(txt);
+						inpEl.appendChild(option);
+					}
 				});
+				if (val.hasOwnProperty('name')){
+					inpEl.value = val.name;
+				}else{
+					inpEl.value = "empty";
+				}
 			}
 			
 			var col8 = document.createElement('div');
@@ -848,6 +906,7 @@
 		}
 		
 		function initCmb(){
+			// attention! select2.bootstrap.min was modified! removed absolute position and width set to 100%
 			$(".js-example-basic-single js-states form-control select2-hidden-accessible").select2();
 		}
 	</script>
