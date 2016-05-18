@@ -123,6 +123,21 @@
 									</div>
 								</div>
 							</div>
+						</div>	
+						<div class="panel panel-default">
+							<a class="btn btn-default" data-toggle="collapse" data-parent="#toolboxContent" href="#signGroup" style="width:100%">
+								Signs
+							</a>
+							<div id="signGroup" class="panel-collapse collapse">
+								<div class="panel-body">
+									<div class="btn-group-vertical" style="width: 100%;">
+										<button type="button" class="btn btn-default" id="mainroadsign" onclick="CreateGraphicObject('mainroadsign');">
+											<img src="Images/mainRoadSign.png" alt="Road">
+											Main Road
+										</button>
+									</div>
+								</div>
+							</div>
 						</div>									
 					</div>	
 					<div id="propertiesContent">
@@ -175,11 +190,11 @@
 			});
 			fCanvas.on('object:selected', function(e) {
 				showProperties(e.target);
-				if (e.target.hasOwnProperty('obj_class') && e.target.obj_class.indexOf('road') > -1){
+				if (e.target.hasOwnProperty('obj_class') && e.target.obj_class.indexOf('road') > -1 && e.target.isType('group')){
 					fCanvas.sendToBack(e.target);		
 				}
 				if (e.target.hasOwnProperty('obj_class') && 
-					(e.target.obj_class != 'road' && e.target.obj_class != 'line')){
+					(e.target.obj_class.indexOf('road') == -1 && e.target.obj_class != 'line')){
 					fCanvas.bringToFront(e.target);
 				}
 			});
@@ -441,6 +456,20 @@
 				});				
 				fCanvas.childs[fCanvas.childs.length] = mark;
 				fCanvas.add(mark);				
+			}
+			if (id == 'mainroadsign'){
+				fabric.Image.fromURL('Images/mainRoadSign.png', function(img) {
+					var carImg = img.set({ 
+						left: 0, top: 0, 
+						name: 'mainRoadSign_' + fCanvas.getObjects().length,
+						obj_class: 'sign',
+						obj_type: 'priority',
+						childs: [],
+						parent: "" 
+					});
+					fCanvas.childs[fCanvas.childs.length] = carImg;
+					fCanvas.add(carImg).renderAll;
+				});
 			}
 			fCanvas.renderAll();
 		}
