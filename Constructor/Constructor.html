@@ -173,10 +173,14 @@
 				height: oldCanvas.parentNode.clientHeight,
 				childs: []
 			});
-			fCanvas.on('object:selected', function(options) {
-				showProperties(options.target);
-				if (options.target.obj_class.indexOf('road') > -1){
-					fCanvas.sendToBack(options.target);		
+			fCanvas.on('object:selected', function(e) {
+				showProperties(e.target);
+				if (e.target.hasOwnProperty('obj_class') && e.target.obj_class.indexOf('road') > -1){
+					fCanvas.sendToBack(e.target);		
+				}
+				if (e.target.hasOwnProperty('obj_class') && 
+					(e.target.obj_class != 'road' && e.target.obj_class != 'line')){
+					fCanvas.bringToFront(e.target);
 				}
 			});
 			fCanvas.on('mouse:move', function(options) {
@@ -225,10 +229,7 @@
 				}
 			});
 			fCanvas.on('object:moving', function(e) {
-				if (e.target.hasOwnProperty('obj_class') && 
-					(e.target.obj_class != 'road' && e.target.obj_class != 'line')){
-					fCanvas.bringToFront(e.target);
-				}
+				
 			});
 
 			fCanvas.on('object:modified', function(e) {
@@ -246,22 +247,22 @@
 					var lines = getObjectsByClass('line');
 					lines.forEach(function(line){
 						if (activeObject != line){
+							var index = line.childs.indexOf(activeObject);
+							var oldParent = activeObject.parent == '' ? fCanvas : activeObject.parent;							
 							if (line.containsPoint(mousePos))
 							{
-								var exists = false;
-								line.childs.forEach(function(child){
-									if (child == activeObject){
-										exists = true;
-										return;
-									}
-								});
-								if (!exists){
+								if (index == -1){
 									line.childs[line.childs.length] = activeObject;
+									activeObject.parent = line;
+									var oldParentIndex = oldParent.childs.indexOf(activeObject);
+									if (oldParentIndex > -1){
+										oldParent.childs.splice(index, 1);
+									}
 								}
-							}else{
-								var index = line.childs.indexOf(activeObject);
+							}else{								
 								if (index > -1){
 									line.childs.splice(index, 1);
+									activeObject.parent = '';
 								}
 							}
 						}
@@ -403,7 +404,19 @@
 					width: 50, height: 25, 
 					fill: 'red'
 				});
-				var carGroup = new fabric.Group([car],{ 
+				fabric.Image.fromURL('Images/car_above_view.png', function(img) {
+					var carImg = img.set({ 
+						left: 0, top: 0, 
+						name: 'car_' + fCanvas.getObjects().length,
+						obj_class: 'car',
+						obj_type: 'simple',
+						childs: [],
+						parent: "" 
+					});
+					fCanvas.childs[fCanvas.childs.length] = carImg;
+					fCanvas.add(carImg).renderAll;
+				});/*
+				var carGroup = new fabric.Group([oImg],{ 
 					left: 100, top: 100, 
 					name: 'car_' + fCanvas.getObjects().length,
 					obj_class: 'car',
@@ -412,7 +425,7 @@
 					parent: ""
 				});
 				fCanvas.childs[fCanvas.childs.length] = carGroup;
-				fCanvas.add(carGroup);
+				fCanvas.add(carGroup);*/
 			}
 			if (id == 'single_dotted_markup'){
 				var w = 200; h = 100;
@@ -981,6 +994,6 @@
 			element.click();
 
 			document.body.removeChild(element);
-		}
+		}		
 	</script>
 </html>
