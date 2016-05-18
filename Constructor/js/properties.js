@@ -10,6 +10,7 @@ var carProperties = [
     { name: 'rd_indicator', text: 'right direction indicator' }, 
     { name: 'ld_indicator', text: 'left direction indicator' }
 ];
+var signProperties = [ { name: 'number', text: 'number' }, { name: 'limit', text: 'text' }];
 
 function createJsonProperties(){
     var result = [];
@@ -23,6 +24,9 @@ function createJsonProperties(){
         result[result.length] = lineProperties[i].name;
     }
     for (var i=0;i<carProperties.length;i++){
+        result[result.length] = carProperties[i].name;
+    }
+    for (var i=0;i<signProperties.length;i++){
         result[result.length] = carProperties[i].name;
     }
     

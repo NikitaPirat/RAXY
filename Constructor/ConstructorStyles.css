@@ -37,3 +37,10 @@
 #propertiesContent{
 	display: none;
 }
+
+@font-face
+{
+	font-family: signsFont;
+	src: url('fonts/russianroadsign-medium.otf'),
+	url('fonts/russianroadsign-medium.otf'); /* IE9 */
+}

@@ -101,7 +101,7 @@
 											<img src="Images/markup.png" alt="markup" style="padding-right: 5px;">
 											Single Dotted
 										</button>
-										<button type="button" class="btn btn-default" id="crossRoad" onclick="CreateGraphicObject('crossRoad');">
+										<button type="button" class="btn btn-default" id="crossRoad" onclick="CreateGraphicObject('single_solid_markup');">
 											<img src="Images/markup_double_solid.png" alt="Road" style="padding-right: 5px;">
 											Single Solid
 										</button>
@@ -120,6 +120,10 @@
 											<img src="Images/car.png" alt="Road">
 											Car
 										</button>
+										<button type="button" class="btn btn-default" id="red_car" onclick="CreateGraphicObject('red_car');">
+											<img src="Images/red_car.png" alt="Road">
+											Car
+										</button>
 									</div>
 								</div>
 							</div>
@@ -133,7 +137,23 @@
 									<div class="btn-group-vertical" style="width: 100%;">
 										<button type="button" class="btn btn-default" id="mainroadsign" onclick="CreateGraphicObject('mainroadsign');">
 											<img src="Images/mainRoadSign.png" alt="Road">
-											Main Road
+											Priority Sign
+										</button>
+									</div>
+								</div>
+								<div class="panel-body">
+									<div class="btn-group-vertical" style="width: 100%;">
+										<button type="button" class="btn btn-default" id="sign_2_4" onclick="CreateGraphicObject('sign_2_4');">
+											<img src="Images/sign_2_4.png" alt="Road">
+											Give Way
+										</button>
+									</div>
+								</div>
+								<div class="panel-body">
+									<div class="btn-group-vertical" style="width: 100%;">
+										<button type="button" class="btn btn-default" id="sign_3_24" onclick="CreateGraphicObject('sign_3_24');">
+											<img src="Images/sign_3_24.png" alt="Road">
+											Speed Limit
 										</button>
 									</div>
 								</div>
@@ -188,6 +208,12 @@
 				height: oldCanvas.parentNode.clientHeight,
 				childs: []
 			});
+			var text = new fabric.Text('60',{
+						left: 12, top: 12,
+						fill: 'black',
+						fontSize: 24,
+						fontFamily: 'signsFont'
+					});
 			fCanvas.on('object:selected', function(e) {
 				showProperties(e.target);
 				if (e.target.hasOwnProperty('obj_class') && e.target.obj_class.indexOf('road') > -1 && e.target.isType('group')){
@@ -344,6 +370,15 @@
 		function dropElement(id){
 			
 		}
+		
+		function removeUnusedControls(object){
+			object['setControlVisible']('tl', false);	
+			object['setControlVisible']('bl', false);	
+			object['setControlVisible']('tr', false);	
+			object['setControlVisible']('br', false);	
+			object['setControlVisible']('mb', false);	
+			object['setControlVisible']('mt', false);	
+		}
 
 		function CreateGraphicObject(id){
 			// maybe do not use graphic objects for some situation objects (f.e. lines could be a 'virtual' objects)
@@ -375,8 +410,10 @@
 					name: 'markup_' + (fCanvas.getObjects().length),
 					obj_class: 'markup',
 					obj_type: 'separate',
-					childs: [] 
-				});								
+					childs: [],
+					lockScalingY: true
+				});		
+				removeUnusedControls(mark);				
 				var road = new fabric.Rect({ 
 					width: w, height: h, 
 										
@@ -389,36 +426,17 @@
 					obj_class: 'road',
 					obj_type: 'asphalt',
 					childs: [line1,line2,mark],
-					parent: ""	 
+					parent: "",
+					lockScalingY: true	 
 				});
+				removeUnusedControls(roadGroup);
 				mark.parent = line2.parent = line1.parent = roadGroup;
 				fCanvas.add(mark);
 				fCanvas.childs[fCanvas.childs.length] = roadGroup;
 				fCanvas.add(roadGroup);
 				fCanvas.sendToBack(roadGroup);				
 			}
-			if (id == 'crossRoad'){
-				var hr = 20; var crSize = 100;
-				// M - moveTo x y; Q - quadraticCurveTo topPoint x,y, endPoint x,y; L - lineTo x y
-				var cross = new fabric.Path('M 0 20 Q 20, 20, 20, 0 L 120 0 Q 120, 20, 140, 20 ' + 
-					'L 140 120 Q 120, 120, 120, 140 ' + 
-					'L 20 140 Q 20, 120, 0, 120 ', {
-						left: 0,
-						top: 0,
-						fill: 'black'
-					});
-
-				var roadGroup = new fabric.Group([cross],{ left: 100, top: 100 });
-				roadGroup.name = 'crossRoad' + fCanvas.getObjects().length;
-				
-				fCanvas.add(roadGroup);
-			}
 			if (id == 'car'){
-				var car = new fabric.Rect({
-					left: 0, top: 0, 
-					width: 50, height: 25, 
-					fill: 'red'
-				});
 				fabric.Image.fromURL('Images/car_above_view.png', function(img) {
 					var carImg = img.set({ 
 						left: 0, top: 0, 
@@ -426,21 +444,35 @@
 						obj_class: 'car',
 						obj_type: 'simple',
 						childs: [],
-						parent: "" 
+						parent: "",
+						lockScalingY: true,
+						lockScalingX: true
 					});
+					removeUnusedControls(carImg);
+					carImg['setControlVisible']('ml', false);
+					carImg['setControlVisible']('mr', false);
 					fCanvas.childs[fCanvas.childs.length] = carImg;
 					fCanvas.add(carImg).renderAll;
-				});/*
-				var carGroup = new fabric.Group([oImg],{ 
-					left: 100, top: 100, 
-					name: 'car_' + fCanvas.getObjects().length,
-					obj_class: 'car',
-					obj_type: 'simple',
-					childs: [],
-					parent: ""
 				});
-				fCanvas.childs[fCanvas.childs.length] = carGroup;
-				fCanvas.add(carGroup);*/
+			}
+			if (id == 'red_car'){
+				fabric.Image.fromURL('Images/red_car_above_view.png', function(img) {
+					var carImg = img.set({ 
+						left: 0, top: 0, 
+						name: 'car_' + fCanvas.getObjects().length,
+						obj_class: 'car',
+						obj_type: 'simple',
+						childs: [],
+						parent: "",
+						lockScalingY: true,
+						lockScalingX: true
+					});
+					removeUnusedControls(carImg);
+					carImg['setControlVisible']('ml', false);
+					carImg['setControlVisible']('mr', false);
+					fCanvas.childs[fCanvas.childs.length] = carImg;
+					fCanvas.add(carImg).renderAll;
+				});
 			}
 			if (id == 'single_dotted_markup'){
 				var w = 200; h = 100;
@@ -452,25 +484,84 @@
 					obj_class: 'markup',
 					obj_type: 'separate',
 					childs: [],
-					parent: ''
+					parent: '',
+					lockScalingY: true
 				});				
+				removeUnusedControls(mark);
 				fCanvas.childs[fCanvas.childs.length] = mark;
 				fCanvas.add(mark);				
 			}
 			if (id == 'mainroadsign'){
 				fabric.Image.fromURL('Images/mainRoadSign.png', function(img) {
-					var carImg = img.set({ 
+					var image = img.set({ 
 						left: 0, top: 0, 
 						name: 'mainRoadSign_' + fCanvas.getObjects().length,
 						obj_class: 'sign',
 						obj_type: 'priority',
 						childs: [],
-						parent: "" 
+						parent: "",
+						number: '2.1',
+						lockScalingY: true,
+						lockScalingX: true  
 					});
-					fCanvas.childs[fCanvas.childs.length] = carImg;
-					fCanvas.add(carImg).renderAll;
+					removeUnusedControls(image);
+					image['setControlVisible']('ml', false);
+					image['setControlVisible']('mr', false);
+					fCanvas.childs[fCanvas.childs.length] = image;
+					fCanvas.add(image).renderAll;
 				});
 			}
+			if (id == 'sign_2_4'){
+				fabric.Image.fromURL('Images/sign_2_4.png', function(img) {
+					var image = img.set({ 
+						left: 0, top: 0, 
+						name: 'sign_2_4' + fCanvas.getObjects().length,
+						obj_class: 'sign',
+						obj_type: 'priority',
+						childs: [],
+						parent: "",
+						number: '2.4',
+						lockScalingY: true,
+						lockScalingX: true  
+					});
+					removeUnusedControls(image);
+					image['setControlVisible']('ml', false);
+					image['setControlVisible']('mr', false);
+					fCanvas.childs[fCanvas.childs.length] = image;
+					fCanvas.add(image).renderAll;
+				});
+			}
+			if (id == 'sign_3_24'){
+				fabric.Image.fromURL('Images/sign_3_24_template.png', function(img) {
+					var image = img.set({ 
+						left: 0, top: 0						 
+					});
+					var text = new fabric.Text('60',{
+						left: 12, top: 12,
+						fill: 'black',
+						fontSize: 24,
+						fontFamily: 'signsFont'
+					});
+					var signGroup = new fabric.Group([image, text],{
+						left: 0, top: 0,
+						name: 'sign_2_4' + fCanvas.getObjects().length,
+						obj_class: 'sign',
+						obj_type: 'prohibiting',
+						childs: [],
+						parent: "",
+						number: '3.24',
+						limit: '60',
+						lockScalingY: true,
+						lockScalingX: true 
+					});
+					removeUnusedControls(signGroup);
+					signGroup['setControlVisible']('ml', false);
+					signGroup['setControlVisible']('mr', false);
+					fCanvas.childs[fCanvas.childs.length] = signGroup;
+					fCanvas.add(signGroup);
+				});
+			}
+			
 			fCanvas.renderAll();
 		}
 		
@@ -872,6 +963,9 @@
 					}
 					if (object.obj_class == 'car'){
 						Array.prototype.push.apply(properties, carProperties);
+					}
+					if (object.obj_class == 'sign'){
+						Array.prototype.push.apply(properties, signProperties);
 					}
 					for(var i = 0; i < properties.length; i++){
 						var val = '';
