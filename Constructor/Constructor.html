@@ -124,6 +124,10 @@
 											<img src="Images/red_car.png" alt="Road">
 											Car
 										</button>
+										<button type="button" class="btn btn-default" id="orange_car" onclick="CreateGraphicObject('orange_car');">
+											<img src="Images/orange_car.png" alt="Road">
+											Car
+										</button>
 									</div>
 								</div>
 							</div>
@@ -383,9 +387,9 @@
 		function CreateGraphicObject(id){
 			// maybe do not use graphic objects for some situation objects (f.e. lines could be a 'virtual' objects)
 			if (id == 'singleRoad'){
-				var w = 200; h = 100;
+				var w = 200; h = 50;
 				var line1 = new fabric.Rect({ 
-					width: w, height: h/2, 
+					width: w, height: h, 
 					fill: 'black',
 					name: 'line_' + fCanvas.getObjects().length,
 					obj_class: 'line',
@@ -394,8 +398,8 @@
 				});
 				//fCanvas.add(line1);
 				var line2 = new fabric.Rect({ 
-					left: 0, top: h/2, 
-					width: w, height: h/2, 
+					left: 0, top: h, 
+					width: w, height: h, 
 					fill: 'black',
 					name: 'line_' + (fCanvas.getObjects().length+1),
 					obj_class: 'line',
@@ -403,7 +407,7 @@
 					childs: []						
 				});
 				//fCanvas.add(line2);
-				var mark = new fabric.Line([0, h/2-1, w, h/2-1], { 
+				/*var mark = new fabric.Line([0, h/2-1, w, h/2-1], { 
 					stroke:'white', 
 					strokeWidth: 3, 
 					strokeDashArray: [20, 5], 
@@ -413,9 +417,9 @@
 					childs: [],
 					lockScalingY: true
 				});		
-				removeUnusedControls(mark);				
+				removeUnusedControls(mark);*/				
 				var road = new fabric.Rect({ 
-					width: w, height: h, 
+					width: w, height: h*2 
 										
 				});
 				// using child-parent concept,  
@@ -425,20 +429,58 @@
 					name: 'road_' + (fCanvas.getObjects().length),
 					obj_class: 'road',
 					obj_type: 'asphalt',
-					childs: [line1,line2,mark],
+					lines: 2,
+					childs: [line1,line2],//,mark],
 					parent: "",
 					lockScalingY: true	 
 				});
+				roadGroup.updateLinesNumber = function(number){
+					
+				};
 				removeUnusedControls(roadGroup);
-				mark.parent = line2.parent = line1.parent = roadGroup;
-				fCanvas.add(mark);
+				//mark.parent = 
+				line2.parent = line1.parent = roadGroup;
+				//fCanvas.add(mark);
 				fCanvas.childs[fCanvas.childs.length] = roadGroup;
 				fCanvas.add(roadGroup);
 				fCanvas.sendToBack(roadGroup);				
 			}
-			if (id == 'car'){
-				fabric.Image.fromURL('Images/car_above_view.png', function(img) {
+			if (id.indexOf('car') > -1){
+				var url;
+				if (id == 'car') { url = 'Images/car_above_view.png'; }
+				if (id == 'red_car') { url = 'Images/red_car_above_view.png'; } 
+				if (id == 'orange_car') { url = 'Images/orange_car_above_view.png'; }  
+				fabric.Image.fromURL(url, function(img) {
 					var carImg = img.set({ 
+						left: 0, top: 0
+					});
+					var lforward = new fabric.Circle({
+						left: carImg.left + carImg.width - 10, top: carImg.top, 
+						radius: 5,
+						fill: 'yellow',
+						visible: false
+					});
+					
+					var lback = new fabric.Circle({
+						left: carImg.left, top: carImg.top, 
+						radius: 5,
+						fill: 'yellow',
+						visible: false
+					});
+					var rforward = new fabric.Circle({
+						left: carImg.left + carImg.width - 10, top: carImg.top + carImg.height - 10, 
+						radius: 5,
+						fill: 'yellow',
+						visible: false
+					});
+					
+					var rback = new fabric.Circle({
+						left: carImg.left, top: carImg.top + carImg.height - 10, 
+						radius: 5,
+						fill: 'yellow',
+						visible: false
+					});
+					var carGroup = new fabric.Group([carImg, lforward, lback, rforward, rback], {
 						left: 0, top: 0, 
 						name: 'car_' + fCanvas.getObjects().length,
 						obj_class: 'car',
@@ -447,31 +489,33 @@
 						parent: "",
 						lockScalingY: true,
 						lockScalingX: true
-					});
-					removeUnusedControls(carImg);
+					})
+					carGroup.updateDirIndicators = function(left, right){
+						if (left != 'do not update'){
+							if (left == true || left == 'true' || left == 'yes' || left == '+' || left == '1'){
+								this.getObjects()[1].visible = true;
+								this.getObjects()[2].visible = true;
+							}else{
+								this.getObjects()[1].visible = false;
+								this.getObjects()[2].visible = false;
+							}
+						}
+						if (right != 'do not update'){
+							if (right == true || right == 'true' || right == 'yes' || right == '+' || right == '1'){
+								this.getObjects()[3].visible = true;
+								this.getObjects()[4].visible = true;
+							}else{
+								this.getObjects()[3].visible = false;
+								this.getObjects()[4].visible = false;
+							}
+						}
+						fCanvas.renderAll();
+					}
+					removeUnusedControls(carGroup);
 					carImg['setControlVisible']('ml', false);
 					carImg['setControlVisible']('mr', false);
-					fCanvas.childs[fCanvas.childs.length] = carImg;
-					fCanvas.add(carImg).renderAll;
-				});
-			}
-			if (id == 'red_car'){
-				fabric.Image.fromURL('Images/red_car_above_view.png', function(img) {
-					var carImg = img.set({ 
-						left: 0, top: 0, 
-						name: 'car_' + fCanvas.getObjects().length,
-						obj_class: 'car',
-						obj_type: 'simple',
-						childs: [],
-						parent: "",
-						lockScalingY: true,
-						lockScalingX: true
-					});
-					removeUnusedControls(carImg);
-					carImg['setControlVisible']('ml', false);
-					carImg['setControlVisible']('mr', false);
-					fCanvas.childs[fCanvas.childs.length] = carImg;
-					fCanvas.add(carImg).renderAll;
+					fCanvas.childs[fCanvas.childs.length] = carGroup;
+					fCanvas.add(carGroup);
 				});
 			}
 			if (id == 'single_dotted_markup'){
@@ -555,6 +599,20 @@
 						lockScalingX: true 
 					});
 					removeUnusedControls(signGroup);
+					signGroup.updateText = function (newText){
+						var txtObj = this.getObjects()[1];
+						if (newText.length == 3){
+							txtObj.left = 10 - this.width/2;
+						}
+						if (newText.length == 2){
+							txtObj.left = 12 - this.width/2;
+						}
+						if (newText.length == 1){
+							txtObj.left = 20 - this.width/2;
+						}
+						txtObj.text = newText;
+						fCanvas.renderAll();
+					};
 					signGroup['setControlVisible']('ml', false);
 					signGroup['setControlVisible']('mr', false);
 					fCanvas.childs[fCanvas.childs.length] = signGroup;
@@ -1022,7 +1080,16 @@
 					fCanvas.getActiveObject()[prop.name] = inpEl.value;
 					if (inpEl.id == 'name_input'){
 						UpdateTreeView();
-					}				
+					}	
+					if (inpEl.id == 'limit_input'){
+						fCanvas.getActiveObject().updateText(inpEl.value);
+					}
+					if (inpEl.id == 'ld_indicator_input'){
+						fCanvas.getActiveObject().updateDirIndicators(inpEl.value, 'do not update')
+					}			
+					if (inpEl.id == 'rd_indicator_input'){
+						fCanvas.getActiveObject().updateDirIndicators('do not update', inpEl.value)
+					}
 				};
 			}
 			if (type == "cmb"){
