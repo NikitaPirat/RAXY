@@ -31,5 +31,8 @@ function createJsonProperties(){
         result[result.length] = carProperties[i].name;
     }
     
+    result[result.length] = 'childs';
+    result[result.length] = 'parents';
+    
     return result;
 }
