@@ -533,3 +533,248 @@ function getCornerPoints(actStart, actEnd, objStart, objEnd, type){
 
     return {p1: objPoint, p2: median, p3: actPoint, p4: inters};      
 }
+
+function createCrossRoad(objCorners, actCorners, names){
+  			var actPrepared = prepareIntersection({start: {x: actCorners.tl.x, y: actCorners.tl.y}, end: {x: actCorners.tr.x, y: actCorners.tr.y}}, {start: {x: actCorners.bl.x, y: actCorners.bl.y}, end: {x: actCorners.br.x, y: actCorners.br.y}});
+    		var objPrepared = prepareIntersection({start: {x: objCorners.tl.x, y: objCorners.tl.y}, end: {x: objCorners.tr.x, y: objCorners.tr.y}}, {start: {x: objCorners.bl.x, y: objCorners.bl.y}, end: {x: objCorners.br.x, y: objCorners.br.y}});
+    		
+    		var corner1 = getCornerPoints(actPrepared.topLine.start, actPrepared.topLine.end, objPrepared.topLine.start, objPrepared.topLine.end, 'aToT');
+    		var corner2 = getCornerPoints(actPrepared.topLine.start, actPrepared.topLine.end, objPrepared.bottomLine.start, objPrepared.bottomLine.end, 'aToB');
+    		var corner3 = getCornerPoints(actPrepared.bottomLine.start, actPrepared.bottomLine.end, objPrepared.topLine.start, objPrepared.topLine.end, 'aBoT');
+    		var corner4 = getCornerPoints(actPrepared.bottomLine.start, actPrepared.bottomLine.end, objPrepared.bottomLine.start, objPrepared.bottomLine.end, 'aBoB');
+
+    		var minX = fCanvas.width, minY = fCanvas.height;
+    		var path ='';
+    		if (corner1){
+    			path += 'M ' + corner1.p1.x + ' ' + corner1.p1.y + ' Q ' + corner1.p2.x + ' ' + corner1.p2.y + ' ' + corner1.p3.x + ' ' + corner1.p3.y + ' ';
+    			minX = Math.min(corner1.p1.x,corner1.p2.x,corner1.p3.x, minX);
+    			minY = Math.min(corner1.p1.y,corner1.p2.y,corner1.p3.y, minY);
+    		}
+    		if (corner3){
+				var c;
+				if (path.indexOf('M ') < 0){
+					c = 'M ';
+				}else{
+					c = ' L ';
+				}
+    			path += c + corner3.p3.x + ' ' + corner3.p3.y + ' Q ' + corner3.p2.x + ' ' + corner3.p2.y + ' ' + corner3.p1.x + ' ' + corner3.p1.y + ' ';
+
+    			minX = Math.min(corner3.p1.x,corner3.p2.x,corner3.p3.x, minX);
+    			minY = Math.min(corner3.p1.y,corner3.p2.y,corner3.p3.y, minY);
+    		}						
+    		if (corner4){
+				var c;
+				if (path.indexOf('M ') < 0){
+					c = 'M ';
+				}else{
+					c = ' L ';
+				}    			
+    			path += c + corner4.p1.x + ' ' + corner4.p1.y + ' Q ' + corner4.p2.x + ' ' + corner4.p2.y + ' ' + corner4.p3.x + ' ' + corner4.p3.y + ' ';
+
+    			minX = Math.min(corner4.p1.x,corner4.p2.x,corner4.p3.x, minX);
+    			minY = Math.min(corner4.p1.y,corner4.p2.y,corner4.p3.y, minY);
+    		}	
+    		if (corner2){
+				var c;
+				if (path.indexOf('M ') < 0){
+					c = 'M ';
+				}else{
+					c = ' L ';
+				}
+    			path += c + corner2.p3.x + ' ' + corner2.p3.y + ' Q ' + corner2.p2.x + ' ' + corner2.p2.y + ' ' + corner2.p1.x + ' ' + corner2.p1.y;
+
+    			minX = Math.min(corner2.p1.x,corner2.p2.x,corner2.p3.x, minX);
+    			minY = Math.min(corner2.p1.y,corner2.p2.y,corner2.p3.y, minY);
+    		}
+
+    		if (path == '' || path.indexOf('L ') < 0 || (path.match(/L /g) || []).length == 2) { return; }
+			
+			var tCross = false;
+			if ((path.match(/L /g) || []).length == 1){
+				tCross = true;
+				if (corner1 && corner3){
+					var corner2 //interaToB 
+						= {p4: intersection3([ actPrepared.topLine.start, actPrepared.topLine.end], 
+						[objPrepared.bottomLine.start, objPrepared.bottomLine.end])};
+					var corner4 //interaBoB 
+						= {p4: intersection3([ actPrepared.bottomLine.start, actPrepared.bottomLine.end], 
+						[objPrepared.bottomLine.start, objPrepared.bottomLine.end])};
+					path += ' L ' + corner4.p4.x + ' ' + corner4.p4.y + ' L ' + corner2.p4.x + ' ' + corner2.p4.y;
+					minX = Math.min(minX, corner2.p4.x, corner4.p4.x);
+					minY = Math.min(minY, corner2.p4.y, corner4.p4.y);
+				}else{
+					if (corner2 && corner4){
+						var corner3 //interaBoT
+							= {p4: intersection3([ actPrepared.bottomLine.start, actPrepared.bottomLine.end], 
+							[objPrepared.topLine.start, objPrepared.topLine.end])};
+						var corner1 //interaToT
+							= {p4: intersection3([ actPrepared.topLine.start, actPrepared.topLine.end], 
+							[objPrepared.topLine.start, objPrepared.topLine.end])};
+						path += ' L ' + corner1.p4.x + ' ' + corner1.p4.y + ' L ' + corner3.p4.x + ' ' + corner3.p4.y;
+						minX = Math.min(minX, corner1.p4.x, corner3.p4.x);
+						minY = Math.min(minY, corner1.p4.y, corner3.p4.y);
+					}else{
+						if (corner1 && corner2){
+							var corner3 //interaBoT
+								= {p4: intersection3([ actPrepared.bottomLine.start, actPrepared.bottomLine.end], 
+								[objPrepared.topLine.start, objPrepared.topLine.end])};
+							var corner4 //interaBoB
+								= {p4: intersection3([ actPrepared.bottomLine.start, actPrepared.bottomLine.end], 
+								[objPrepared.bottomLine.start, objPrepared.bottomLine.end])};
+							var pathParts = path.split('L');
+							path = pathParts[0] + ' L ' + corner3.p4.x + ' ' + corner3.p4.y + ' L ' + corner4.p4.x + ' ' + corner4.p4.y + ' ' + pathParts[1];
+							minX = Math.min(minX, corner3.p4.x, corner4.p4.x);
+							minY = Math.min(minY, corner3.p4.y, corner4.p4.y);
+						}else{
+							if (corner3 && corner4){
+								var corner1 //interaToT
+									= {p4: intersection3([ actPrepared.topLine.start, actPrepared.topLine.end], 
+									[objPrepared.topLine.start, objPrepared.topLine.end])};
+								var corner2 //interaToB
+									= {p4: intersection3([ actPrepared.topLine.start, actPrepared.topLine.end], 
+									[objPrepared.bottomLine.start, objPrepared.bottomLine.end])};
+								path += ' L ' + corner2.p4.x + ' ' + corner2.p4.y + ' L ' + corner1.p4.x + ' ' + corner1.p4.y;
+								minX = Math.min(minX, corner1.p4.x, corner2.p4.x);
+								minY = Math.min(minY, corner1.p4.y, corner2.p4.y);
+							}
+						}
+					}
+				}
+			}
+    		var minPoint = 
+    		{
+    			x: minX,
+    			y: minY
+    		}    		
+
+    		var crossRoad = new fabric.Path(path, {
+  					left: minPoint.x,
+  					top: minPoint.y,
+  					fill: 'black',
+					name: 'cross_' + names.aName + '_' + names.oName,
+					perPixelTargetFind: true,
+					obj_class: 'cross_road',
+					obj_type: 'asphalt',
+					childs: []  //,
+					//hasControls: false,
+					//hasBorders: false
+  				});
+    		var crossObjects = [];
+    		//fCanvas.add(crossRoad);
+			crossObjects[0] = crossRoad;
+			var partName = 'road';
+			// aToT aBoT
+			if (corner1.hasOwnProperty('p1') || corner3.hasOwnProperty('p1')){
+				var dirPoint;
+				dirPoint1 = {x: actPrepared.bottomLine.end.x, y: actPrepared.bottomLine.end.y};
+				dirPoint2 = {x: actPrepared.topLine.end.x, y: actPrepared.topLine.end.y};
+				var actRoadPartStr1 = 'M ' + corner1.p4.x + ' ' + corner1.p4.y +
+					' L ' + corner3.p4.x + ' ' + corner3.p4.y +
+					' L ' + dirPoint1.x + ' ' + dirPoint1.y +
+					' L ' + dirPoint2.x + ' ' + dirPoint2.y;
+				var actRoadPartObj1 = new fabric.Path(actRoadPartStr1, {
+						left: Math.min(corner1.p4.x, corner3.p4.x, dirPoint1.x, dirPoint2.x),
+						top: Math.min(corner1.p4.y, corner3.p4.y, dirPoint1.y, dirPoint2.y),
+						fill: 'black',
+						name: partName + '_actRoadPartObj1',
+						perPixelTargetFind: true,
+						obj_class: 'road',
+						obj_type: 'asphalt',
+						childs: [] //,
+						//hasControls: false,
+						//hasBorders: false
+					});
+				crossObjects[crossObjects.length] = actRoadPartObj1;
+				//fCanvas.add(actRoadPartObj1);
+			}
+			// aToB aBoB
+			if (corner2.hasOwnProperty('p1') || corner4.hasOwnProperty('p1')){
+				var dirPoint;
+				dirPoint1 = {x: actPrepared.bottomLine.start.x, y: actPrepared.bottomLine.start.y};
+				dirPoint2 = {x: actPrepared.topLine.start.x, y: actPrepared.topLine.start.y};
+				var actRoadPartStr2 = 'M ' + corner2.p4.x + ' ' + corner2.p4.y +
+					' L ' + corner4.p4.x + ' ' + corner4.p4.y +
+					' L ' + dirPoint1.x + ' ' + dirPoint1.y +
+					' L ' + dirPoint2.x + ' ' + dirPoint2.y;
+				var actRoadPartObj2 = new fabric.Path(actRoadPartStr2, {
+						left: Math.min(corner2.p4.x, corner4.p4.x,  dirPoint1.x, dirPoint2.x),
+						top: Math.min(corner2.p4.y, corner4.p4.y, dirPoint1.y, dirPoint2.y),
+						fill: 'black',
+						name: partName + '_actRoadPartObj2',
+						perPixelTargetFind: true,
+						obj_class: 'road',
+						obj_type: 'asphalt',
+						childs: [] //,
+						//hasControls: false,
+						//hasBorders: false
+					});
+				//fCanvas.add(actRoadPartObj2);
+				crossObjects[crossObjects.length] = actRoadPartObj2;
+			}
+			// aToT aToB
+			if (corner1.hasOwnProperty('p1') || corner2.hasOwnProperty('p1')){
+				var dirPoint;
+				dirPoint1 = {x: objPrepared.bottomLine.end.x, y: objPrepared.bottomLine.end.y};
+				dirPoint2 = {x: objPrepared.topLine.end.x, y: objPrepared.topLine.end.y};
+				var actRoadPartStr3 = 'M ' + corner1.p4.x + ' ' + corner1.p4.y +
+					' L ' + corner2.p4.x + ' ' + corner2.p4.y +
+					' L ' + dirPoint1.x + ' ' + dirPoint1.y +
+					' L ' + dirPoint2.x + ' ' + dirPoint2.y;
+				var actRoadPartObj3 = new fabric.Path(actRoadPartStr3, {
+						left: Math.min(corner1.p4.x, corner2.p4.x, dirPoint1.x, dirPoint2.x),
+						top: Math.min(corner1.p4.y, corner2.p4.y, dirPoint1.y, dirPoint2.y),
+						fill: 'black',
+						name: partName + '_actRoadPartObj3',
+						perPixelTargetFind: true,
+						obj_class: 'road',
+						obj_type: 'asphalt',
+						childs: [] //,
+						//hasControls: false,
+						//hasBorders: false
+					});
+				//fCanvas.add(actRoadPartObj3);
+				crossObjects[crossObjects.length] = actRoadPartObj3;
+			}
+			// aBoT aBoB
+			if (corner3.hasOwnProperty('p1') || corner4.hasOwnProperty('p1')){
+				var dirPoint;
+				dirPoint1 = {x: objPrepared.bottomLine.start.x, y: objPrepared.bottomLine.start.y};
+				dirPoint2 = {x: objPrepared.topLine.start.x, y: objPrepared.topLine.start.y};
+				var actRoadPartStr4 = 'M ' + corner3.p4.x + ' ' + corner3.p4.y +
+					' L ' + corner4.p4.x + ' ' + corner4.p4.y +
+					' L ' + dirPoint1.x + ' ' + dirPoint1.y +
+					' L ' + dirPoint2.x + ' ' + dirPoint2.y;
+				var actRoadPartObj4 = new fabric.Path(actRoadPartStr4, {
+						left: Math.min(corner3.p4.x, corner4.p4.x, dirPoint1.x, dirPoint2.x),
+						top: Math.min(corner3.p4.y, corner4.p4.y, dirPoint1.y, dirPoint2.y),
+						fill: 'black',
+						name: partName + '_actRoadPartObj4',
+						perPixelTargetFind: true,
+						obj_class: 'road',
+						obj_type: 'asphalt',
+						childs: [] //,
+						//hasControls: false,
+						//hasBorders: false
+					});
+				//fCanvas.add(actRoadPartObj4);
+				crossObjects[crossObjects.length] = actRoadPartObj4;
+			}
+			removeObjectByName(names.aName); removeObjectByName(names.oName);			
+			var roadGroup = new fabric.Group(crossObjects, 
+				{
+					name: 'cross_' + fCanvas.getObjects().length,
+					originX: 'center',
+    				originY: 'center',
+					perPixelTargetFind: true,
+					obj_class: 'cross_road',
+					obj_type: 'asphalt',
+					childs: crossObjects,
+					parent: ''
+					//hasControls: false,
+					//hasBorders: false
+				});			
+			crossObjects.forEach(function(obj){
+				obj.parent = roadGroup;
+			});
+			fCanvas.add(roadGroup);
+  		}

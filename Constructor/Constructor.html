@@ -303,14 +303,14 @@
 					var lines = getObjectsByClass('line');
 					lines.forEach(function(line){
 						if (activeObject != line){
-							var index = line.childs.indexOf(activeObject);
+							var index = line.childs.indexOf(activeObject.name);
 							var oldParent = activeObject.parent == '' ? fCanvas : activeObject.parent;							
 							if (line.containsPoint(mousePos))
 							{
 								if (index == -1){
-									line.childs[line.childs.length] = activeObject;
+									line.childs[line.childs.length] = activeObject.name;
 									activeObject.parent = line;
-									var oldParentIndex = oldParent.childs.indexOf(activeObject);
+									var oldParentIndex = oldParent.childs.indexOf(activeObject.name);
 									if (oldParentIndex > -1){
 										oldParent.childs.splice(index, 1);
 									}
@@ -323,7 +323,6 @@
 							}
 						}
 					});
-					var test = getChildObjects(fCanvas.childs[0]);
 					UpdateTreeView();
 				}
 			});
@@ -334,38 +333,21 @@
 				if (!e.target.hasOwnProperty('childs')){
 					e.target.childs = [];
 				}
-				if (e.target.parent == '' && fCanvas.childs.indexOf(e.target) == -1){
-					fCanvas.childs[fCanvas.childs.length] = e.target;
+				if (e.target.parent == '' && fCanvas.childs.indexOf(e.target.name) == -1){
+					fCanvas.childs[fCanvas.childs.length] = e.target.name;
 				}
 				UpdateTreeView();
 			});
 			fCanvas.on('object:removed', function(e){
-				var removedObj = e.target;
-				var childs = getChildObjects(removedObj);
-				childs.forEach(function(child){
-					fCanvas.remove(child);
-				});
-				var oldParent;
-				if (removedObj.hasOwnProperty('parent') && removedObj.parent != ''){
-					if (removedObj.parent.hasOwnProperty('name')){
-						oldParent = removedObj.parent;
-					}else{
-						oldParent = getObjectByName(removedObj.parent);						
-					}						
-				}else{
-					oldParent = fCanvas;
-				}
-				var index = oldParent.childs.indexOf(removedObj);
-				if (index > -1){
-					oldParent.childs.splice(index, 1);
-				}
-				UpdateTreeView();
-				showObjects();
+				
 			});
 
 			var canvasDiv = document.getElementById('canvasDiv');
 			canvasDiv.tabIndex = 1000;
 			canvasDiv.addEventListener("keydown", canvKeyDown, false);
+			var objectsList = document.getElementById('objectsList');
+			objectsList.tabIndex = 1000;
+			objectsList.addEventListener("keydown", canvKeyDown, false);
 		}
 		
 		window.onresize = function(){
@@ -378,7 +360,28 @@
 
 		function canvKeyDown(e){
 			if (e.keyCode == 46){
-				fCanvas.remove(fCanvas.getActiveObject());
+				var removedObj = fCanvas.getActiveObject();
+				var childs = getChildObjects(removedObj);
+				childs.forEach(function(child){
+					fCanvas.remove(getObjectByName(child));
+				});
+				var oldParent;
+				if (removedObj.hasOwnProperty('parent') && removedObj.parent != ''){
+					if (removedObj.parent.hasOwnProperty('name')){
+						oldParent = removedObj.parent;
+					}else{
+						oldParent = getObjectByName(removedObj.parent);						
+					}						
+				}else{
+					oldParent = fCanvas;
+				}
+				var index = oldParent.childs.indexOf(removedObj.name);
+				if (index > -1){
+					oldParent.childs.splice(index, 1);
+				}
+				UpdateTreeView();
+				showObjects();
+				fCanvas.remove(removedObj);
 			}
 		}
 		
@@ -441,7 +444,7 @@
 					obj_class: 'road',
 					obj_type: 'asphalt',
 					lines: 2,
-					childs: [line1,line2],//,mark],
+					childs: [line1.name,line2.name],//,mark],
 					parent: "",
 					lockScalingY: true	 
 				});
@@ -452,7 +455,7 @@
 				//mark.parent = 
 				line2.parent = line1.parent = roadGroup;
 				//fCanvas.add(mark);
-				fCanvas.childs[fCanvas.childs.length] = roadGroup;
+				fCanvas.childs[fCanvas.childs.length] = roadGroup.name;
 				fCanvas.add(roadGroup);
 				fCanvas.sendToBack(roadGroup);				
 			}
@@ -525,7 +528,7 @@
 					removeUnusedControls(carGroup);
 					carImg['setControlVisible']('ml', false);
 					carImg['setControlVisible']('mr', false);
-					fCanvas.childs[fCanvas.childs.length] = carGroup;
+					fCanvas.childs[fCanvas.childs.length] = carGroup.name;
 					fCanvas.add(carGroup);
 				});
 			}
@@ -543,7 +546,7 @@
 					lockScalingY: true
 				});				
 				removeUnusedControls(mark);
-				fCanvas.childs[fCanvas.childs.length] = mark;
+				fCanvas.childs[fCanvas.childs.length] = mark.name;
 				fCanvas.add(mark);				
 			}
 			if (id.indexOf('sign') > -1){
@@ -578,7 +581,7 @@
 					removeUnusedControls(image);
 					image['setControlVisible']('ml', false);
 					image['setControlVisible']('mr', false);
-					fCanvas.childs[fCanvas.childs.length] = image;
+					fCanvas.childs[fCanvas.childs.length] = image.name;
 					fCanvas.add(image).renderAll;
 				});
 				if (id == 'sign_3_24'){
@@ -621,7 +624,7 @@
 						};
 						signGroup['setControlVisible']('ml', false);
 						signGroup['setControlVisible']('mr', false);
-						fCanvas.childs[fCanvas.childs.length] = signGroup;
+						fCanvas.childs[fCanvas.childs.length] = signGroup.name;
 						fCanvas.add(signGroup);
 					});
 				}				
@@ -676,7 +679,7 @@
 				removeUnusedControls(lightGroup);
 				lightGroup['setControlVisible']('ml', false);
 				lightGroup['setControlVisible']('mr', false);
-				fCanvas.childs[fCanvas.childs.length] = lightGroup;
+				fCanvas.childs[fCanvas.childs.length] = lightGroup.name;
 				fCanvas.add(lightGroup);
 			}
 			fCanvas.renderAll();
@@ -684,14 +687,14 @@
 		
 		function getChildObjects(object){
 			result = [];
-			return getChildObjectsRec(object, result);
+			return getChildObjectsNamesRec(object, result);
 		}
 		
-		function getChildObjectsRec(object, result){
+		function getChildObjectsNamesRec(object, result){
 			if (object.hasOwnProperty('childs')){
-				result[result.length] = object;
+				result[result.length] = object.name;
 				for (var i = 0; i < object.childs.length; i++){
-					getChildObjectsRec(object.childs[i], result);
+					getChildObjectsNamesRec(getObjectByName(object.childs[i]), result);
 				}
 			}
 			return result;
@@ -701,8 +704,8 @@
 			var childs = fCanvas.childs;
 			var data = [];  
 			for (var i = 0; i < childs.length; i++){
-				if (childs[i].hasOwnProperty('obj_class')) {
-					data[data.length] = getNodesFromObject(childs[i]);
+				if (getObjectByName(childs[i]).hasOwnProperty('obj_class')) {
+					data[data.length] = getNodesFromObject(getObjectByName(childs[i]));
 				}
 			}
 			$selectableTree = initSelectableTree(data);
@@ -712,7 +715,7 @@
 			if (object.hasOwnProperty('childs') && object.childs.length > 0){
 				var result = [];
 				object.childs.forEach(function(child){
-					var node = getNodesFromObject(child);
+					var node = getNodesFromObject(getObjectByName(child));
 					if (node){
 						result[result.length] = node;
 					}
@@ -739,252 +742,7 @@
 				});
 				fCanvas.renderAll();
 			});
-		}
-
-  		function createCrossRoad(objCorners, actCorners, names){
-  			var actPrepared = prepareIntersection({start: {x: actCorners.tl.x, y: actCorners.tl.y}, end: {x: actCorners.tr.x, y: actCorners.tr.y}}, {start: {x: actCorners.bl.x, y: actCorners.bl.y}, end: {x: actCorners.br.x, y: actCorners.br.y}});
-    		var objPrepared = prepareIntersection({start: {x: objCorners.tl.x, y: objCorners.tl.y}, end: {x: objCorners.tr.x, y: objCorners.tr.y}}, {start: {x: objCorners.bl.x, y: objCorners.bl.y}, end: {x: objCorners.br.x, y: objCorners.br.y}});
-    		
-    		var corner1 = getCornerPoints(actPrepared.topLine.start, actPrepared.topLine.end, objPrepared.topLine.start, objPrepared.topLine.end, 'aToT');
-    		var corner2 = getCornerPoints(actPrepared.topLine.start, actPrepared.topLine.end, objPrepared.bottomLine.start, objPrepared.bottomLine.end, 'aToB');
-    		var corner3 = getCornerPoints(actPrepared.bottomLine.start, actPrepared.bottomLine.end, objPrepared.topLine.start, objPrepared.topLine.end, 'aBoT');
-    		var corner4 = getCornerPoints(actPrepared.bottomLine.start, actPrepared.bottomLine.end, objPrepared.bottomLine.start, objPrepared.bottomLine.end, 'aBoB');
-
-    		var minX = fCanvas.width, minY = fCanvas.height;
-    		var path ='';
-    		if (corner1){
-    			path += 'M ' + corner1.p1.x + ' ' + corner1.p1.y + ' Q ' + corner1.p2.x + ' ' + corner1.p2.y + ' ' + corner1.p3.x + ' ' + corner1.p3.y + ' ';
-    			minX = Math.min(corner1.p1.x,corner1.p2.x,corner1.p3.x, minX);
-    			minY = Math.min(corner1.p1.y,corner1.p2.y,corner1.p3.y, minY);
-    		}
-    		if (corner3){
-				var c;
-				if (path.indexOf('M ') < 0){
-					c = 'M ';
-				}else{
-					c = ' L ';
-				}
-    			path += c + corner3.p3.x + ' ' + corner3.p3.y + ' Q ' + corner3.p2.x + ' ' + corner3.p2.y + ' ' + corner3.p1.x + ' ' + corner3.p1.y + ' ';
-
-    			minX = Math.min(corner3.p1.x,corner3.p2.x,corner3.p3.x, minX);
-    			minY = Math.min(corner3.p1.y,corner3.p2.y,corner3.p3.y, minY);
-    		}						
-    		if (corner4){
-				var c;
-				if (path.indexOf('M ') < 0){
-					c = 'M ';
-				}else{
-					c = ' L ';
-				}    			
-    			path += c + corner4.p1.x + ' ' + corner4.p1.y + ' Q ' + corner4.p2.x + ' ' + corner4.p2.y + ' ' + corner4.p3.x + ' ' + corner4.p3.y + ' ';
-
-    			minX = Math.min(corner4.p1.x,corner4.p2.x,corner4.p3.x, minX);
-    			minY = Math.min(corner4.p1.y,corner4.p2.y,corner4.p3.y, minY);
-    		}	
-    		if (corner2){
-				var c;
-				if (path.indexOf('M ') < 0){
-					c = 'M ';
-				}else{
-					c = ' L ';
-				}
-    			path += c + corner2.p3.x + ' ' + corner2.p3.y + ' Q ' + corner2.p2.x + ' ' + corner2.p2.y + ' ' + corner2.p1.x + ' ' + corner2.p1.y;
-
-    			minX = Math.min(corner2.p1.x,corner2.p2.x,corner2.p3.x, minX);
-    			minY = Math.min(corner2.p1.y,corner2.p2.y,corner2.p3.y, minY);
-    		}
-
-    		if (path == '' || path.indexOf('L ') < 0 || (path.match(/L /g) || []).length == 2) { return; }
-			
-			var tCross = false;
-			if ((path.match(/L /g) || []).length == 1){
-				tCross = true;
-				if (corner1 && corner3){
-					var corner2 //interaToB 
-						= {p4: intersection3([ actPrepared.topLine.start, actPrepared.topLine.end], 
-						[objPrepared.bottomLine.start, objPrepared.bottomLine.end])};
-					var corner4 //interaBoB 
-						= {p4: intersection3([ actPrepared.bottomLine.start, actPrepared.bottomLine.end], 
-						[objPrepared.bottomLine.start, objPrepared.bottomLine.end])};
-					path += ' L ' + corner4.p4.x + ' ' + corner4.p4.y + ' L ' + corner2.p4.x + ' ' + corner2.p4.y;
-					minX = Math.min(minX, corner2.p4.x, corner4.p4.x);
-					minY = Math.min(minY, corner2.p4.y, corner4.p4.y);
-				}else{
-					if (corner2 && corner4){
-						var corner3 //interaBoT
-							= {p4: intersection3([ actPrepared.bottomLine.start, actPrepared.bottomLine.end], 
-							[objPrepared.topLine.start, objPrepared.topLine.end])};
-						var corner1 //interaToT
-							= {p4: intersection3([ actPrepared.topLine.start, actPrepared.topLine.end], 
-							[objPrepared.topLine.start, objPrepared.topLine.end])};
-						path += ' L ' + corner1.p4.x + ' ' + corner1.p4.y + ' L ' + corner3.p4.x + ' ' + corner3.p4.y;
-						minX = Math.min(minX, corner1.p4.x, corner3.p4.x);
-						minY = Math.min(minY, corner1.p4.y, corner3.p4.y);
-					}else{
-						if (corner1 && corner2){
-							var corner3 //interaBoT
-								= {p4: intersection3([ actPrepared.bottomLine.start, actPrepared.bottomLine.end], 
-								[objPrepared.topLine.start, objPrepared.topLine.end])};
-							var corner4 //interaBoB
-								= {p4: intersection3([ actPrepared.bottomLine.start, actPrepared.bottomLine.end], 
-								[objPrepared.bottomLine.start, objPrepared.bottomLine.end])};
-							var pathParts = path.split('L');
-							path = pathParts[0] + ' L ' + corner3.p4.x + ' ' + corner3.p4.y + ' L ' + corner4.p4.x + ' ' + corner4.p4.y + ' ' + pathParts[1];
-							minX = Math.min(minX, corner3.p4.x, corner4.p4.x);
-							minY = Math.min(minY, corner3.p4.y, corner4.p4.y);
-						}else{
-							if (corner3 && corner4){
-								var corner1 //interaToT
-									= {p4: intersection3([ actPrepared.topLine.start, actPrepared.topLine.end], 
-									[objPrepared.topLine.start, objPrepared.topLine.end])};
-								var corner2 //interaToB
-									= {p4: intersection3([ actPrepared.topLine.start, actPrepared.topLine.end], 
-									[objPrepared.bottomLine.start, objPrepared.bottomLine.end])};
-								path += ' L ' + corner2.p4.x + ' ' + corner2.p4.y + ' L ' + corner1.p4.x + ' ' + corner1.p4.y;
-								minX = Math.min(minX, corner1.p4.x, corner2.p4.x);
-								minY = Math.min(minY, corner1.p4.y, corner2.p4.y);
-							}
-						}
-					}
-				}
-			}
-    		var minPoint = 
-    		{
-    			x: minX,
-    			y: minY
-    		}    		
-
-    		var crossRoad = new fabric.Path(path, {
-  					left: minPoint.x,
-  					top: minPoint.y,
-  					fill: 'black',
-					name: 'cross_' + names.aName + '_' + names.oName,
-					perPixelTargetFind: true,
-					obj_class: 'cross_road',
-					obj_type: 'asphalt',
-					childs: []  //,
-					//hasControls: false,
-					//hasBorders: false
-  				});
-    		var crossObjects = [];
-    		//fCanvas.add(crossRoad);
-			crossObjects[0] = crossRoad;
-			var partName = 'road';
-			// aToT aBoT
-			if (corner1.hasOwnProperty('p1') || corner3.hasOwnProperty('p1')){
-				var dirPoint;
-				dirPoint1 = {x: actPrepared.bottomLine.end.x, y: actPrepared.bottomLine.end.y};
-				dirPoint2 = {x: actPrepared.topLine.end.x, y: actPrepared.topLine.end.y};
-				var actRoadPartStr1 = 'M ' + corner1.p4.x + ' ' + corner1.p4.y +
-					' L ' + corner3.p4.x + ' ' + corner3.p4.y +
-					' L ' + dirPoint1.x + ' ' + dirPoint1.y +
-					' L ' + dirPoint2.x + ' ' + dirPoint2.y;
-				var actRoadPartObj1 = new fabric.Path(actRoadPartStr1, {
-						left: Math.min(corner1.p4.x, corner3.p4.x, dirPoint1.x, dirPoint2.x),
-						top: Math.min(corner1.p4.y, corner3.p4.y, dirPoint1.y, dirPoint2.y),
-						fill: 'black',
-						name: partName + '_actRoadPartObj1',
-						perPixelTargetFind: true,
-						obj_class: 'road',
-						obj_type: 'asphalt',
-						childs: [] //,
-						//hasControls: false,
-						//hasBorders: false
-					});
-				crossObjects[crossObjects.length] = actRoadPartObj1;
-				//fCanvas.add(actRoadPartObj1);
-			}
-			// aToB aBoB
-			if (corner2.hasOwnProperty('p1') || corner4.hasOwnProperty('p1')){
-				var dirPoint;
-				dirPoint1 = {x: actPrepared.bottomLine.start.x, y: actPrepared.bottomLine.start.y};
-				dirPoint2 = {x: actPrepared.topLine.start.x, y: actPrepared.topLine.start.y};
-				var actRoadPartStr2 = 'M ' + corner2.p4.x + ' ' + corner2.p4.y +
-					' L ' + corner4.p4.x + ' ' + corner4.p4.y +
-					' L ' + dirPoint1.x + ' ' + dirPoint1.y +
-					' L ' + dirPoint2.x + ' ' + dirPoint2.y;
-				var actRoadPartObj2 = new fabric.Path(actRoadPartStr2, {
-						left: Math.min(corner2.p4.x, corner4.p4.x,  dirPoint1.x, dirPoint2.x),
-						top: Math.min(corner2.p4.y, corner4.p4.y, dirPoint1.y, dirPoint2.y),
-						fill: 'black',
-						name: partName + '_actRoadPartObj2',
-						perPixelTargetFind: true,
-						obj_class: 'road',
-						obj_type: 'asphalt',
-						childs: [] //,
-						//hasControls: false,
-						//hasBorders: false
-					});
-				//fCanvas.add(actRoadPartObj2);
-				crossObjects[crossObjects.length] = actRoadPartObj2;
-			}
-			// aToT aToB
-			if (corner1.hasOwnProperty('p1') || corner2.hasOwnProperty('p1')){
-				var dirPoint;
-				dirPoint1 = {x: objPrepared.bottomLine.end.x, y: objPrepared.bottomLine.end.y};
-				dirPoint2 = {x: objPrepared.topLine.end.x, y: objPrepared.topLine.end.y};
-				var actRoadPartStr3 = 'M ' + corner1.p4.x + ' ' + corner1.p4.y +
-					' L ' + corner2.p4.x + ' ' + corner2.p4.y +
-					' L ' + dirPoint1.x + ' ' + dirPoint1.y +
-					' L ' + dirPoint2.x + ' ' + dirPoint2.y;
-				var actRoadPartObj3 = new fabric.Path(actRoadPartStr3, {
-						left: Math.min(corner1.p4.x, corner2.p4.x, dirPoint1.x, dirPoint2.x),
-						top: Math.min(corner1.p4.y, corner2.p4.y, dirPoint1.y, dirPoint2.y),
-						fill: 'black',
-						name: partName + '_actRoadPartObj3',
-						perPixelTargetFind: true,
-						obj_class: 'road',
-						obj_type: 'asphalt',
-						childs: [] //,
-						//hasControls: false,
-						//hasBorders: false
-					});
-				//fCanvas.add(actRoadPartObj3);
-				crossObjects[crossObjects.length] = actRoadPartObj3;
-			}
-			// aBoT aBoB
-			if (corner3.hasOwnProperty('p1') || corner4.hasOwnProperty('p1')){
-				var dirPoint;
-				dirPoint1 = {x: objPrepared.bottomLine.start.x, y: objPrepared.bottomLine.start.y};
-				dirPoint2 = {x: objPrepared.topLine.start.x, y: objPrepared.topLine.start.y};
-				var actRoadPartStr4 = 'M ' + corner3.p4.x + ' ' + corner3.p4.y +
-					' L ' + corner4.p4.x + ' ' + corner4.p4.y +
-					' L ' + dirPoint1.x + ' ' + dirPoint1.y +
-					' L ' + dirPoint2.x + ' ' + dirPoint2.y;
-				var actRoadPartObj4 = new fabric.Path(actRoadPartStr4, {
-						left: Math.min(corner3.p4.x, corner4.p4.x, dirPoint1.x, dirPoint2.x),
-						top: Math.min(corner3.p4.y, corner4.p4.y, dirPoint1.y, dirPoint2.y),
-						fill: 'black',
-						name: partName + '_actRoadPartObj4',
-						perPixelTargetFind: true,
-						obj_class: 'road',
-						obj_type: 'asphalt',
-						childs: [] //,
-						//hasControls: false,
-						//hasBorders: false
-					});
-				//fCanvas.add(actRoadPartObj4);
-				crossObjects[crossObjects.length] = actRoadPartObj4;
-			}
-			removeObjectByName(names.aName); removeObjectByName(names.oName);			
-			var roadGroup = new fabric.Group(crossObjects, 
-				{
-					name: 'cross_' + fCanvas.getObjects().length,
-					originX: 'center',
-    				originY: 'center',
-					perPixelTargetFind: true,
-					obj_class: 'cross_road',
-					obj_type: 'asphalt',
-					childs: crossObjects,
-					parent: ''
-					//hasControls: false,
-					//hasBorders: false
-				});			
-			crossObjects.forEach(function(obj){
-				obj.parent = roadGroup;
-			});
-			fCanvas.add(roadGroup);
-  		}
+		} 		
 
   		function removeObjectByName(name){
   			fCanvas.forEachObject(function(obj){
@@ -1169,7 +927,7 @@
 					}else{
 						oldParent = fCanvas;
 					}
-					var index = oldParent.childs.indexOf(activeObj);
+					var index = oldParent.childs.indexOf(activeObj.name);
 					if (index > -1){
 						oldParent.childs.splice(index, 1);
 					}
@@ -1183,7 +941,7 @@
 					if (!newParent.hasOwnProperty('childs')){
 						newParent.childs = [];
 					}				
-					newParent.childs[newParent.childs.length] = activeObj;
+					newParent.childs[newParent.childs.length] = activeObj.name;
 					this.oldvalue = this.value;						
 					UpdateTreeView();
 				};
@@ -1195,7 +953,8 @@
 				var txt = document.createTextNode("");
 				option.appendChild(txt);
 				inpEl.appendChild(option);
-				list.forEach(function(o){
+				list.forEach(function(child){
+					var o = getObjectByName(child);
 					if (o.hasOwnProperty('name')){
 						var option = document.createElement("option");
 						option.value = o.name;
