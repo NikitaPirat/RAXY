@@ -11,6 +11,7 @@ var carProperties = [
     { name: 'ld_indicator', text: 'left direction indicator' }
 ];
 var signProperties = [ { name: 'number', text: 'number' }, { name: 'limit', text: 'value' }];
+var lightProperties = [ { name: 'signal', text: 'signal' } ];
 
 function createJsonProperties(){
     var result = [];

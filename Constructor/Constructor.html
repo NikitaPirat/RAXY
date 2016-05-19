@@ -140,24 +140,31 @@
 								<div class="panel-body">
 									<div class="btn-group-vertical" style="width: 100%;">
 										<button type="button" class="btn btn-default" id="mainroadsign" onclick="CreateGraphicObject('mainroadsign');">
-											<img src="Images/mainRoadSign.png" alt="Road">
+											<img src="Images/mainRoadSign.png" alt="sign">
 											Priority Sign
 										</button>
-									</div>
-								</div>
-								<div class="panel-body">
-									<div class="btn-group-vertical" style="width: 100%;">
 										<button type="button" class="btn btn-default" id="sign_2_4" onclick="CreateGraphicObject('sign_2_4');">
-											<img src="Images/sign_2_4.png" alt="Road">
+											<img src="Images/sign_2_4.png" alt="sign">
 											Give Way
+										</button>
+										<button type="button" class="btn btn-default" id="sign_3_24" onclick="CreateGraphicObject('sign_3_24');">
+											<img src="Images/sign_3_24.png" alt="sign">
+											Speed Limit
 										</button>
 									</div>
 								</div>
+							</div>
+						</div>
+						<div class="panel panel-default">
+							<a class="btn btn-default" data-toggle="collapse" data-parent="#toolboxContent" href="#lightGroup" style="width:100%">
+								Lights
+							</a>
+							<div id="lightGroup" class="panel-collapse collapse">
 								<div class="panel-body">
 									<div class="btn-group-vertical" style="width: 100%;">
-										<button type="button" class="btn btn-default" id="sign_3_24" onclick="CreateGraphicObject('sign_3_24');">
-											<img src="Images/sign_3_24.png" alt="Road">
-											Speed Limit
+										<button type="button" class="btn btn-default" id="simple_light" onclick="CreateGraphicObject('simple_light');">
+											<img src="Images/simple_light.png" alt="light">
+											Simple Light
 										</button>
 									</div>
 								</div>
@@ -539,7 +546,7 @@
 				fabric.Image.fromURL('Images/mainRoadSign.png', function(img) {
 					var image = img.set({ 
 						left: 0, top: 0, 
-						name: 'mainRoadSign_' + fCanvas.getObjects().length,
+						name: 'sign_2.1_' + fCanvas.getObjects().length,
 						obj_class: 'sign',
 						obj_type: 'priority',
 						childs: [],
@@ -559,7 +566,7 @@
 				fabric.Image.fromURL('Images/sign_2_4.png', function(img) {
 					var image = img.set({ 
 						left: 0, top: 0, 
-						name: 'sign_2_4' + fCanvas.getObjects().length,
+						name: 'sign_2.4_' + fCanvas.getObjects().length,
 						obj_class: 'sign',
 						obj_type: 'priority',
 						childs: [],
@@ -588,7 +595,7 @@
 					});
 					var signGroup = new fabric.Group([image, text],{
 						left: 0, top: 0,
-						name: 'sign_2_4' + fCanvas.getObjects().length,
+						name: 'sign_3.24_' + fCanvas.getObjects().length,
 						obj_class: 'sign',
 						obj_type: 'prohibiting',
 						childs: [],
@@ -620,6 +627,58 @@
 				});
 			}
 			
+			if (id.indexOf('light') > -1){
+				var body = new fabric.Rect({ width: 20, height: 65, rx: 5, ry: 5 });
+				var red = new fabric.Circle({
+					left: body.left + 2, top: body.top + 5, 
+					radius: 8,
+					fill: 'gray'
+				});
+				var yellow = new fabric.Circle({
+					left: body.left + 2, top: body.top + 25, 
+					radius: 8,
+					fill: 'gray'
+				});
+				var green = new fabric.Circle({
+					left: body.left + 2, top: body.top + 45, 
+					radius: 8,
+					fill: 'gray'
+				});
+				var lightGroup = new fabric.Group([body, red, yellow, green], {
+					left: 0, top: 0,
+					name: 'light_' + fCanvas.getObjects().length,
+					obj_class: 'light',
+					obj_type: 'simple',
+					childs: [],
+					parent: "",
+					signal: '',
+					lockScalingY: true,
+					lockScalingX: true
+				});
+				lightGroup.updateSignal = function (signal){
+					if (signal == 'red' || signal == 'r'){
+						lightGroup.getObjects()[1].fill = 'red';
+						lightGroup.getObjects()[2].fill = 'gray';
+						lightGroup.getObjects()[3].fill = 'gray';
+					}
+					if (signal == 'yellow' || signal == 'y'){
+						lightGroup.getObjects()[1].fill = 'gray';
+						lightGroup.getObjects()[2].fill = 'yellow';
+						lightGroup.getObjects()[3].fill = 'gray';
+					}
+					if (signal == 'green' || signal == 'g'){
+						lightGroup.getObjects()[1].fill = 'gray';
+						lightGroup.getObjects()[2].fill = 'gray';
+						lightGroup.getObjects()[3].fill = 'green';
+					}
+					fCanvas.renderAll();
+				}
+				removeUnusedControls(lightGroup);
+				lightGroup['setControlVisible']('ml', false);
+				lightGroup['setControlVisible']('mr', false);
+				fCanvas.childs[fCanvas.childs.length] = lightGroup;
+				fCanvas.add(lightGroup);
+			}
 			fCanvas.renderAll();
 		}
 		
@@ -1025,6 +1084,9 @@
 					if (object.obj_class == 'sign'){
 						Array.prototype.push.apply(properties, signProperties);
 					}
+					if (object.obj_class == 'light'){
+						Array.prototype.push.apply(properties, lightProperties);
+					}
 					for(var i = 0; i < properties.length; i++){
 						var val = '';
 						if (object.hasOwnProperty(properties[i].name)){
@@ -1089,6 +1151,9 @@
 					}			
 					if (inpEl.id == 'rd_indicator_input'){
 						fCanvas.getActiveObject().updateDirIndicators('do not update', inpEl.value)
+					}
+					if (inpEl.id == 'signal_input'){
+						fCanvas.getActiveObject().updateSignal(inpEl.value)
 					}
 				};
 			}
