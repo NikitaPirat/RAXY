@@ -151,6 +151,10 @@
 											<img src="Images/sign_3_24.png" alt="sign">
 											Speed Limit
 										</button>
+										<button type="button" class="btn btn-default" id="sign_main_road_dir_tr" onclick="CreateGraphicObject('sign_main_road_dir_tr');">
+											<img src="Images/main_road_dir_tr.png" alt="sign">
+											Main Road Direction
+										</button>
 									</div>
 								</div>
 							</div>
@@ -542,16 +546,32 @@
 				fCanvas.childs[fCanvas.childs.length] = mark;
 				fCanvas.add(mark);				
 			}
-			if (id == 'mainroadsign'){
-				fabric.Image.fromURL('Images/mainRoadSign.png', function(img) {
+			if (id.indexOf('sign') > -1){
+				var url, sname, snumber;
+				if (id == 'mainroadsign'){
+					url = 'Images/mainRoadSign.png';
+					sname = 'sign_2.1_';
+					snumber = '2.1';
+				}
+				if (id == 'sign_2_4'){
+					url = 'Images/sign_2_4.png';
+					sname = 'sign_2.4_';
+					snumber = '2.4';
+				}
+				if (id == 'sign_main_road_dir_tr'){
+					url = 'Images/main_road_dir_tr.png';
+					sname = 'sign_8.13_';
+					snumber = '8.13';
+				}
+				fabric.Image.fromURL(url, function(img) {
 					var image = img.set({ 
 						left: 0, top: 0, 
-						name: 'sign_2.1_' + fCanvas.getObjects().length,
+						name: sname + fCanvas.getObjects().length,
 						obj_class: 'sign',
 						obj_type: 'priority',
 						childs: [],
 						parent: "",
-						number: '2.1',
+						number: snumber,
 						lockScalingY: true,
 						lockScalingX: true  
 					});
@@ -561,70 +581,50 @@
 					fCanvas.childs[fCanvas.childs.length] = image;
 					fCanvas.add(image).renderAll;
 				});
-			}
-			if (id == 'sign_2_4'){
-				fabric.Image.fromURL('Images/sign_2_4.png', function(img) {
-					var image = img.set({ 
-						left: 0, top: 0, 
-						name: 'sign_2.4_' + fCanvas.getObjects().length,
-						obj_class: 'sign',
-						obj_type: 'priority',
-						childs: [],
-						parent: "",
-						number: '2.4',
-						lockScalingY: true,
-						lockScalingX: true  
+				if (id == 'sign_3_24'){
+					fabric.Image.fromURL('Images/sign_3_24_template.png', function(img) {
+						var image = img.set({ 
+							left: 0, top: 0						 
+						});
+						var text = new fabric.Text('60',{
+							left: 12, top: 12,
+							fill: 'black',
+							fontSize: 24,
+							fontFamily: 'signsFont'
+						});
+						var signGroup = new fabric.Group([image, text],{
+							left: 0, top: 0,
+							name: 'sign_3.24_' + fCanvas.getObjects().length,
+							obj_class: 'sign',
+							obj_type: 'prohibiting',
+							childs: [],
+							parent: "",
+							number: '3.24',
+							limit: '60',
+							lockScalingY: true,
+							lockScalingX: true 
+						});
+						removeUnusedControls(signGroup);
+						signGroup.updateText = function (newText){
+							var txtObj = this.getObjects()[1];
+							if (newText.length == 3){
+								txtObj.left = 10 - this.width/2;
+							}
+							if (newText.length == 2){
+								txtObj.left = 12 - this.width/2;
+							}
+							if (newText.length == 1){
+								txtObj.left = 20 - this.width/2;
+							}
+							txtObj.text = newText;
+							fCanvas.renderAll();
+						};
+						signGroup['setControlVisible']('ml', false);
+						signGroup['setControlVisible']('mr', false);
+						fCanvas.childs[fCanvas.childs.length] = signGroup;
+						fCanvas.add(signGroup);
 					});
-					removeUnusedControls(image);
-					image['setControlVisible']('ml', false);
-					image['setControlVisible']('mr', false);
-					fCanvas.childs[fCanvas.childs.length] = image;
-					fCanvas.add(image).renderAll;
-				});
-			}
-			if (id == 'sign_3_24'){
-				fabric.Image.fromURL('Images/sign_3_24_template.png', function(img) {
-					var image = img.set({ 
-						left: 0, top: 0						 
-					});
-					var text = new fabric.Text('60',{
-						left: 12, top: 12,
-						fill: 'black',
-						fontSize: 24,
-						fontFamily: 'signsFont'
-					});
-					var signGroup = new fabric.Group([image, text],{
-						left: 0, top: 0,
-						name: 'sign_3.24_' + fCanvas.getObjects().length,
-						obj_class: 'sign',
-						obj_type: 'prohibiting',
-						childs: [],
-						parent: "",
-						number: '3.24',
-						limit: '60',
-						lockScalingY: true,
-						lockScalingX: true 
-					});
-					removeUnusedControls(signGroup);
-					signGroup.updateText = function (newText){
-						var txtObj = this.getObjects()[1];
-						if (newText.length == 3){
-							txtObj.left = 10 - this.width/2;
-						}
-						if (newText.length == 2){
-							txtObj.left = 12 - this.width/2;
-						}
-						if (newText.length == 1){
-							txtObj.left = 20 - this.width/2;
-						}
-						txtObj.text = newText;
-						fCanvas.renderAll();
-					};
-					signGroup['setControlVisible']('ml', false);
-					signGroup['setControlVisible']('mr', false);
-					fCanvas.childs[fCanvas.childs.length] = signGroup;
-					fCanvas.add(signGroup);
-				});
+				}				
 			}
 			
 			if (id.indexOf('light') > -1){
