@@ -18,12 +18,12 @@
 	<script src="js/bootstrap.min.js" type="text/javascript"></script>
 	<script src="js/bootstrap-treeview.min.js" type="text/javascript"></script>
 	<script src="js/combobox/select2.full.min.js" type="text/javascript"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js" type="text/javascript"></script>
 	
 	<!-- my scripts and stylesheets -->	
 	<link rel="stylesheet" href="css/ConstructorStyles.css" type="text/css"/>	
 	<script src="js/helper.js" type="text/javascript"></script>
-	<script src="js/properties.js" type="text/javascript"></script>
+	<script src="js/situation/properties.js" type="text/javascript"></script>
+	<script src="js/situation/relations.js" type="text/javascript"></script>
 	<script src="js/templates.js" type="text/javascript"></script>
 	
 </head>
@@ -56,7 +56,7 @@
 					<span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu">
-					<li><a href="#myModal" data-backdrop="false" data-toggle="modal">Relations</a></li>
+					<li><a href="#modalWindow" data-backdrop="false" data-toggle="modal" onclick="createModalContent('relations');">Relations</a></li>
 					<li><a href="#">Processes</a></li>
 				</ul>
 			</div>
@@ -83,12 +83,12 @@
 				</div>			
 				<div id="toolbox" class="col-sm-2">
 					<div  id="toolboxTabs" class = "btn-group">
-						<button class="btn btn-default" onclick="showObjects();">Objects</button>
-						<button class="btn btn-default" onclick="showProperties(fCanvas.getActiveObject());">Properties</button>
+						<button class="btn btn-default toActive" onclick="showObjects();">Objects</button>
+						<button class="btn btn-default toActive" onclick="showProperties(fCanvas.getActiveObject());">Properties</button>
 					</div>
 					<div id="toolboxContent" class="panel-group">
 						<div class="panel panel-default">
-							<a class="btn btn-default" data-toggle="collapse" data-parent="#toolboxContent" href="#roadGroup" style="width:100%">
+							<a class="btn btn-default toActive" data-toggle="collapse" data-parent="#toolboxContent" href="#roadGroup" style="width:100%">
 								Road
 							</a>
 							<div id="roadGroup" class="panel-collapse collapse">
@@ -103,7 +103,7 @@
 							</div>
 						</div>
 						<div class="panel panel-default">
-							<a class="btn btn-default" data-toggle="collapse" data-parent="#toolboxContent" href="#markGroup" style="width:100%">
+							<a class="btn btn-default toActive" data-toggle="collapse" data-parent="#toolboxContent" href="#markGroup" style="width:100%">
 								Mark Up
 							</a>
 							<div id="markGroup" class="panel-collapse collapse">
@@ -122,7 +122,7 @@
 							</div>
 						</div>	
 						<div class="panel panel-default">
-							<a class="btn btn-default" data-toggle="collapse" data-parent="#toolboxContent" href="#carGroup" style="width:100%">
+							<a class="btn btn-default toActive" data-toggle="collapse" data-parent="#toolboxContent" href="#carGroup" style="width:100%">
 								Transport
 							</a>
 							<div id="carGroup" class="panel-collapse collapse">
@@ -145,7 +145,7 @@
 							</div>
 						</div>	
 						<div class="panel panel-default">
-							<a class="btn btn-default" data-toggle="collapse" data-parent="#toolboxContent" href="#signGroup" style="width:100%">
+							<a class="btn btn-default toActive" data-toggle="collapse" data-parent="#toolboxContent" href="#signGroup" style="width:100%">
 								Signs
 							</a>
 							<div id="signGroup" class="panel-collapse collapse">
@@ -172,7 +172,7 @@
 							</div>
 						</div>
 						<div class="panel panel-default">
-							<a class="btn btn-default" data-toggle="collapse" data-parent="#toolboxContent" href="#lightGroup" style="width:100%">
+							<a class="btn btn-default toActive" data-toggle="collapse" data-parent="#toolboxContent" href="#lightGroup" style="width:100%">
 								Lights
 							</a>
 							<div id="lightGroup" class="panel-collapse collapse">
@@ -194,20 +194,19 @@
 				</div>				
 			</div> 
 		</div>
-		<div id="myModal" class="modal fade">
+		<div id="modalWindow" class="modal fade">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title">Settings</h4>
-
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="$('#modalList').html('');">&times;</button>
+						<h4 class="modal-title" id = "modalTitle"></h4>
 					</div>
-					<div class="modal-body">
-						<p>Settings</p>
+					<div class="modal-body" id="modalList">
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-primary">Save changes</button>
+						<button type="button" class="btn btn-success" onclick="AddRelationRow('empty');">Add relation</button>
+						<button type="button" class="btn btn-info" onclick="saveRelations();">Save changes</button>
+						<button type="button" class="btn btn-warning" data-dismiss="modal" onclick="$('#modalList').html('');">Close</button>						
 					</div>
 				</div>
 				<!-- /.modal-content -->
@@ -218,7 +217,7 @@
 	</body>
 	<script type="text/javascript">
 		var mousePos;
-		$('.btn').click(function() {
+		$('.toActive').click(function() {
 			var btns = document.querySelectorAll(".btn.active");
 			[].forEach.call(btns, function(bt){
 				bt.classList.remove("active");
@@ -383,7 +382,7 @@
 			objectsList.addEventListener("keydown", canvKeyDown, false);
 			
 			
-			$("#myModal").draggable({
+			$("#modalWindow").draggable({
 				handle: ".modal-header"
 			});
 		}
@@ -436,6 +435,9 @@
 			object['setControlVisible']('mt', false);	
 		}
 
+		/*
+			Creates the graphic object by id.
+		*/
 		function CreateGraphicObject(id){
 			// maybe do not use graphic objects for some situation objects (f.e. lines could be a 'virtual' objects)
 			if (id == 'singleRoad'){
@@ -448,7 +450,6 @@
 					obj_type: 'asphalt',
 					childs: []				
 				});
-				//fCanvas.add(line1);
 				var line2 = new fabric.Rect({ 
 					left: 0, top: h, 
 					width: w, height: h, 
@@ -457,24 +458,12 @@
 					obj_class: 'line',
 					obj_type: 'asphalt',
 					childs: []						
-				});
-				//fCanvas.add(line2);
-				/*var mark = new fabric.Line([0, h/2-1, w, h/2-1], { 
-					stroke:'white', 
-					strokeWidth: 3, 
-					strokeDashArray: [20, 5], 
-					name: 'markup_' + (fCanvas.getObjects().length),
-					obj_class: 'markup',
-					obj_type: 'separate',
-					childs: [],
-					lockScalingY: true
-				});		
-				removeUnusedControls(mark);*/				
+				});				
 				var road = new fabric.Rect({ 
 					width: w, height: h*2 
 										
 				});
-				// using child-parent concept,  
+				// using child-parent concept
 				var roadGroup = new fabric.Group([line1,line2,road],
 				{ 
 					left: 0, top: 0, 
@@ -482,17 +471,17 @@
 					obj_class: 'road',
 					obj_type: 'asphalt',
 					lines: 2,
-					childs: [line1.name,line2.name],//,mark],
+					childs: [line1.name,line2.name],
 					parent: "",
 					lockScalingY: true	 
 				});
+				createRelation (line1.name, roadGroup.name, relationTypes['isLocated'], relationProperties['on']);
+				createRelation (line2.name, roadGroup.name, relationTypes['isLocated'], relationProperties['on']);
 				roadGroup.updateLinesNumber = function(number){
 					
 				};
 				removeUnusedControls(roadGroup);
-				//mark.parent = 
 				line2.parent = line1.parent = roadGroup;
-				//fCanvas.add(mark);
 				fCanvas.childs[fCanvas.childs.length] = roadGroup.name;
 				fCanvas.add(roadGroup);
 				fCanvas.sendToBack(roadGroup);				
@@ -723,11 +712,22 @@
 			fCanvas.renderAll();
 		}
 		
+		/*
+			Gets all childs of the specific object.
+			Params:
+			object - whos childs are searching for.
+		*/
 		function getChildObjects(object){
 			result = [];
 			return getChildObjectsNamesRec(object, result);
 		}
 		
+		/*
+			Gets all childs of the specific object recursively.
+			Params:
+			object - whos childs are searching for.
+			result - founded childs.
+		*/
 		function getChildObjectsNamesRec(object, result){
 			if (object.hasOwnProperty('childs')){
 				result[result.length] = object.name;
@@ -738,6 +738,9 @@
 			return result;
 		}
 		
+		/*
+			Updates the tree view.
+		*/
 		function UpdateTreeView(){
 			var childs = fCanvas.childs;
 			var data = [];  
@@ -749,6 +752,9 @@
 			$selectableTree = initSelectableTree(data);
 		}
 		
+		/*
+			Gets nodes for the tree view recursively .
+		*/
 		function getNodesFromObject(object){
 			if (object.hasOwnProperty('childs') && object.childs.length > 0){
 				var result = [];
@@ -791,10 +797,21 @@
   			});
   		}
 		  
+		/*
+			Gets object by name from the canvas (objects from groups are including).
+			Params:
+			name - objects name.
+		*/
 		function getObjectByName(name){
 			return getObjectByNameRec(name, fCanvas);
 		}
 		
+		/*
+			Gets object by name from the specific area (objects from groups are including).
+			Params:
+			name - objects name.
+			area - where the search is starting.
+		*/
 		function getObjectByNameRec(name, area){
 			if (area.hasOwnProperty('name') && area.name == name){
 				return area;
@@ -810,11 +827,23 @@
 			return false;
 		}
 		
+		/*
+			Gets objects by class name from the canvas (objects from groups are including).
+			Params:
+			c - class name.
+		*/
 		function getObjectsByClass(c){
 			var result = [];
 			return getObjectsByClassRec(c, fCanvas, result);
 		}
 		
+		/*
+			Gets objects by class name from the specific area (objects from groups are including).
+			Params:
+			c - class name.
+			area - where the search is starting.
+			result - list of founded objects.
+		*/
 		function getObjectsByClassRec(c, area, result){
 			if (area.hasOwnProperty('obj_class') && area.obj_class == c){
 				result[result.length] = area;
@@ -828,7 +857,11 @@
 			return result;
 		}
 
-		// array []
+		/*
+			Removes object by name parts.
+			Params:
+			parts - array of strings.
+		*/
   		function removeObjectByNameParts(parts){
   			fCanvas.forEachObject(function(obj){
 				var del = false;
@@ -848,11 +881,17 @@
   			});
   		}
 
+		/*
+			Shows objects on the right panel.
+		*/
   		function showObjects(){
   			document.getElementById('propertiesContent').style.display = "none";
   			document.getElementById('toolboxContent').style.display = "block";	
   		}
 
+		/*
+			Shows properties on the right panel.
+		*/
   		function showProperties(object){
 			if (!object.hasOwnProperty('name')) { return; }
   			document.getElementById('toolboxContent').style.display = "none";
@@ -894,6 +933,9 @@
 			}
   		}
 		
+		/*
+			Gets all objects from the Canvas (objects from groups are including).
+		*/
 		function getAllObjects(){
 			result = [];
 			fCanvas.forEachObject(function(o){
@@ -902,6 +944,12 @@
 			return result;
 		}
 		
+		/*
+			Gets all objects from the specific area (objects from groups are including).
+			Params:
+			area - where the search is starting.
+			result - list of founded objects.
+		*/
 		function getAllObjectsRec(area, result){
 			if (!area.hasOwnProperty('_objects') ||
 				area.hasOwnProperty('_objects') && area._objects.length == 0)
@@ -917,6 +965,14 @@
 			return result;
 		}
 		
+		/*
+			Add the property to the properties list.
+			Params:
+			prop = { name, text } - name and text of the displayed property.
+			val - initial value of the input element.
+			type - the type of input element (input or combobox).
+			list - the list of values (for combobox). 
+		*/
 		function addProperty(prop, val, type, list){
 			var txtEl = document.createElement("p");
 			txtEl.style="padding: 7px; margin-right: 5px;";
@@ -934,23 +990,41 @@
 				inpEl.type="text";
 				inpEl.className="form-control";
 				inpEl.value = val;
-				inpEl.onchange = function (){
-					fCanvas.getActiveObject()[prop.name] = inpEl.value;
+				inpEl.onchange = function (){					
 					if (inpEl.id == 'name_input'){
+						// change the corresponding property of the selected object when the value in textbox has been changed
+						var parent = fCanvas.getActiveObject().parent;
+						if (parent == ''){
+							parent = fCanvas;
+						}
+						var ind = parent.childs.indexOf(fCanvas.getActiveObject().name);
+						if (ind > -1){
+							parent.childs.splice(ind,1, inpEl.value);
+						}
+						var relS = findRelationsBySubject1(fCanvas.getActiveObject().name);
+						relS.forEach(function(rel){
+							relations[relations.indexOf(rel)].s1 = inpEl.value;
+						});
+						relS = findRelationsBySubject2(fCanvas.getActiveObject().name);
+						relS.forEach(function(rel){
+							relations[relations.indexOf(rel)].s2 = inpEl.value;
+						});
+						fCanvas.getActiveObject().name = inpEl.value;					
 						UpdateTreeView();
 					}	
 					if (inpEl.id == 'limit_input'){
 						fCanvas.getActiveObject().updateText(inpEl.value);
 					}
 					if (inpEl.id == 'ld_indicator_input'){
-						fCanvas.getActiveObject().updateDirIndicators(inpEl.value, 'do not update')
+						fCanvas.getActiveObject().updateDirIndicators(inpEl.value, 'do not update');
 					}			
 					if (inpEl.id == 'rd_indicator_input'){
-						fCanvas.getActiveObject().updateDirIndicators('do not update', inpEl.value)
+						fCanvas.getActiveObject().updateDirIndicators('do not update', inpEl.value);
 					}
 					if (inpEl.id == 'signal_input'){
-						fCanvas.getActiveObject().updateSignal(inpEl.value)
+						fCanvas.getActiveObject().updateSignal(inpEl.value);
 					}
+					fCanvas.getActiveObject()[prop.name] = inpEl.value;
 				};
 			}
 			if (type == "cmb"){
@@ -980,7 +1054,9 @@
 						newParent.childs = [];
 					}				
 					newParent.childs[newParent.childs.length] = activeObj.name;
-					this.oldvalue = this.value;						
+					this.oldvalue = this.value;	
+					
+					createRelation (activeObj.name, newParent.name, relationTypes.beLocated, relationProperties.on);				
 					UpdateTreeView();
 				};
 				inpEl.onfocus = function(){
@@ -1046,6 +1122,139 @@
 			element.click();
 
 			document.body.removeChild(element);
-		}		
+		}
+		
+		function createModalContent(type){
+			if (type = 'relations'){
+				$('#modalTitle').html('Relations');
+				getRelationsToShow().forEach(function (rel){
+					AddRelationRow(rel);
+				});				
+			}
+		}	
+		
+		function AddRelationRow(rel){
+			var row;
+			if (rel == 'empty'){
+				row = getRelationMadalRow('', '', '', '');
+			}else{
+				row = getRelationMadalRow(rel.s1, rel.s2, rel.type, rel.property);	
+			}
+			var list = document.getElementById('modalList');
+			row.id = 'modalRelationRow_' + list.children.length;
+			list.appendChild(row);
+		}
+		
+		function getRelationMadalRow(initS1, initS2, initType, initProp){
+			var col41 = document.createElement('div');
+			col41.className = "col-sm-3";			
+			col41.style = "padding: 1px;"
+			col41.appendChild(createCmb(getChildObjects(fCanvas), initS1));			
+			
+			var col42 = document.createElement('div');
+			col42.className = "col-sm-3";
+			col42.style = "padding: 1px;"
+			col42.appendChild(createCmb(getChildObjects(fCanvas), initS2));
+			
+			var col43 = document.createElement('div');
+			col43.className = "col-sm-3";
+			col43.style = "padding: 1px;"
+			col43.appendChild(createAssociativeCmb(relationTypes, initType));
+			
+			var col44 = document.createElement('div');
+			col44.className = "col-sm-2";
+			col44.style = "padding: 1px;"
+			col44.appendChild(createAssociativeCmb(relationProperties, initProp));
+			
+			var removeBtn = document.createElement('button');
+			removeBtn.type="button";
+			removeBtn.className="btn btn-danger";
+			removeBtn.innerHTML = '-';
+			removeBtn.style = "width: 100%;";
+			removeBtn.onclick = function(){
+				var row = this.parentNode.parentNode;
+				var relationToRemove = findRelationByAllFields(row.children[0].value, row.children[1].value, row.children[2].value, row.children[3].value);
+				relations.splice(relations.indexOf(relationToRemove[0]), 1);
+				row.parentNode.removeChild(row);
+			}
+			
+			var col45 = document.createElement('div');
+			col45.className = "col-sm-1";
+			col45.style = "padding: 1px;"
+			col45.appendChild(removeBtn);
+			
+			var divRow = document.createElement('div');
+			divRow.className = "row";			
+			divRow.appendChild(col41);			
+			divRow.appendChild(col42);
+			divRow.appendChild(col43);
+			divRow.appendChild(col44);
+			divRow.appendChild(col45);			
+					
+			return divRow;
+		}	
+		
+		// TODO: fix the onchange function
+		function createCmb(values, initValue){
+			var inpEl = document.createElement("select");
+			inpEl.className="js-example-basic-single js-states form-control select2-hidden-accessible";
+			inpEl.onchange = function (){
+				var row = this.parentNode.parentNode;
+				if (!replaceRelation( { s1: row.children[0].oldvalue, s2: row.children[1].oldvalue, type: row.children[2].oldvalue, property: row.children[3].oldvalue }, 
+								  { s1: row.children[0].value, s2: row.children[1].value, type: row.children[2].value, property: row.children[3].value } )){
+					alert ('This relation is already existing');
+				}
+			};
+			inpEl.onfocus = function(){
+				this.oldvalue = this.value;	
+			};
+			var option = document.createElement("option");
+			option.value = "empty";
+			var txt = document.createTextNode("");
+			option.appendChild(txt);
+			inpEl.appendChild(option);
+			values.forEach(function(val){
+				var o = getObjectByName(val);
+				if (o.hasOwnProperty('name')){
+					var option = document.createElement("option");
+					option.value = o.name;
+					var txt = document.createTextNode(o.name);
+					option.appendChild(txt);
+					inpEl.appendChild(option);
+				}
+			});
+			inpEl.value = initValue;
+			return inpEl;
+		}
+		
+		function createAssociativeCmb(asseciotiveArr, initValue){
+			var inpEl = document.createElement("select");
+			inpEl.className="js-example-basic-single js-states form-control select2-hidden-accessible";
+			inpEl.onchange = function (){
+				
+			}
+			inpEl.onfocus = function(){
+				this.oldvalue = this.value;	
+			};
+			var option = document.createElement("option");
+			option.value = "empty";
+			var txt = document.createTextNode("");
+			option.appendChild(txt);
+			inpEl.appendChild(option);
+			for (key in asseciotiveArr){
+				var option = document.createElement("option");
+				option.value = asseciotiveArr[key];
+				var txt = document.createTextNode(asseciotiveArr[key]);
+				option.appendChild(txt);
+				inpEl.appendChild(option);
+			}
+			inpEl.value = initValue;
+			return inpEl;
+		}
+		
+		function saveRelations(){
+			var rows = $('#modalList').find('select');
+			createRelation(rows[0].value, rows[1].value, rows[2].value, rows[3].value);
+		}
 	</script>
 </html>

@@ -41,15 +41,31 @@
 @font-face
 {
 	font-family: signsFont;
-	src: url('fonts/russianroadsign-medium.otf'),
-	url('fonts/russianroadsign-medium.otf'); /* IE9 */
+	src: url('../fonts/russianroadsign-medium.otf'),
+	url('../fonts/russianroadsign-medium.otf'); /* IE9 */
 }
 
 .modal
 {
+	width: 1500px;
     overflow: hidden;
 }
 .modal-dialog{
     margin-right: 0;
     margin-left: 0;
+}
+
+textarea:hover, 
+input:hover, 
+textarea:active, 
+input:active, 
+textarea:focus, 
+input:focus,
+button:focus,
+button:active,
+button:hover,
+div
+{
+    outline:0px !important;
+    -webkit-appearance:none;
 }
