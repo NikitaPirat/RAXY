@@ -44,3 +44,12 @@
 	src: url('fonts/russianroadsign-medium.otf'),
 	url('fonts/russianroadsign-medium.otf'); /* IE9 */
 }
+
+.modal
+{
+    overflow: hidden;
+}
+.modal-dialog{
+    margin-right: 0;
+    margin-left: 0;
+}
