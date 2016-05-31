@@ -67,7 +67,7 @@
 					<span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu">
-					<li><a href="#">Analyze fake</a></li>
+					<li><a href="#" onclick="sendToAnalyze();">Analyze</a></li>
 				</ul>
 			</div>
 			<div class="btn-group">
@@ -1132,7 +1132,7 @@
 		
 		function doExport(){
 			fCanvas.relations = relations;
-			//fCanvas.processes = processes;
+			fCanvas.processes = processes;
 			var propToExport = createJsonProperties();
 			var exportData = window._json = fCanvas.toJSON(propToExport);
 			fCanvas.includeDefaultValues = false;
@@ -1404,6 +1404,23 @@
 				$('#modalWindow').modal('hide'); 
 				$('#modalList').html('');
 			}
+		}
+		
+		function sendToAnalyze(){
+			fCanvas.relations = relations;
+			fCanvas.processes = processes;
+			var propToExport = createJsonProperties();
+			var exportData = window._json = fCanvas.toJSON(propToExport);
+			fCanvas.includeDefaultValues = false;
+			exportData = JSON.stringify(exportData);
+			
+			$.post(
+				'http://localhost/IntelligentCBR.WebServices/api/import',
+				exportData,
+				function(data, status) {
+					alert("Response: " + data + '; Status: ' + status);
+				}
+			);
 		}
 	</script>
 </html>
