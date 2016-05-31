@@ -778,3 +778,30 @@ function createCrossRoad(objCorners, actCorners, names){
 			});
 			fCanvas.add(roadGroup);
   		}
+          
+
+function createJsonProperties(){
+    var result = [];
+    for (var i=0;i<sharedProperties.length;i++){
+        result[result.length] = sharedProperties[i].name;
+    }
+    for (var i=0;i<roadProperties.length;i++){
+        result[result.length] = roadProperties[i].name;
+    }
+    for (var i=0;i<lineProperties.length;i++){
+        result[result.length] = lineProperties[i].name;
+    }
+    for (var i=0;i<carProperties.length;i++){
+        result[result.length] = carProperties[i].name;
+    }
+    for (var i=0;i<signProperties.length;i++){
+        result[result.length] = carProperties[i].name;
+    }
+    
+    result[result.length] = 'childs';
+    result[result.length] = 'parents';
+    result[result.length] = 'relations';
+    result[result.length] = 'processes';
+    
+    return result;
+}

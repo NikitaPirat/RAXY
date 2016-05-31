@@ -205,8 +205,8 @@
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-success" onclick="AddRelationRow('empty');">Add relation</button>
-						<button type="button" class="btn btn-info" onclick="saveRelations();">Save changes</button>
-						<button type="button" class="btn btn-warning" data-dismiss="modal" onclick="$('#modalList').html('');">Close</button>						
+						<button type="button" class="btn btn-info" onclick="saveRelations(); $('#modalWindow').modal('hide'); $('#modalList').html('');">Save & Close</button>
+						<button type="button" class="btn btn-warning" data-dismiss="modal" onclick="$('#modalList').html('');">Cancel</button>						
 					</div>
 				</div>
 				<!-- /.modal-content -->
@@ -1103,6 +1103,8 @@
 		}
 		
 		function doExport(){
+			fCanvas.relations = relations;
+			//fCanvas.processes = processes;
 			var propToExport = createJsonProperties();
 			var exportData = window._json = fCanvas.toJSON(propToExport);
 			fCanvas.includeDefaultValues = false;
@@ -1194,16 +1196,10 @@
 			return divRow;
 		}	
 		
-		// TODO: fix the onchange function
 		function createCmb(values, initValue){
 			var inpEl = document.createElement("select");
 			inpEl.className="js-example-basic-single js-states form-control select2-hidden-accessible";
 			inpEl.onchange = function (){
-				/*var row = this.parentNode.parentNode;
-				if (!replaceRelation( { s1: row.children[0].oldvalue, s2: row.children[1].oldvalue, type: row.children[2].oldvalue, property: row.children[3].oldvalue }, 
-								  { s1: row.children[0].value, s2: row.children[1].value, type: row.children[2].value, property: row.children[3].value } )){
-					alert ('This relation is already existing');
-				}*/
 			};
 			inpEl.onfocus = function(){
 				this.oldvalue = this.value;	
@@ -1261,7 +1257,6 @@
 					alert ('Line [' + i + ']: one or more of the values are empty or such relation is already exist');
 				}				
 			};
-			//createRelation(rows[0].value, rows[1].value, rows[2].value, rows[3].value);
 		}
 	</script>
 </html>
