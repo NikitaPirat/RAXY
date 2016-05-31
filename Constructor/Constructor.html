@@ -22,8 +22,9 @@
 	<!-- my scripts and stylesheets -->	
 	<link rel="stylesheet" href="css/ConstructorStyles.css" type="text/css"/>	
 	<script src="js/helper.js" type="text/javascript"></script>
-	<script src="js/situation/properties.js" type="text/javascript"></script>
-	<script src="js/situation/relations.js" type="text/javascript"></script>
+	<script src="js/situation/property.js" type="text/javascript"></script>
+	<script src="js/situation/relation.js" type="text/javascript"></script>
+	<script src="js/situation/process.js" type="text/javascript"></script>
 	<script src="js/templates.js" type="text/javascript"></script>
 	
 </head>
@@ -52,12 +53,21 @@
 			</div>
 			<div class="btn-group">
 				<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-					Tools
+					Situation
 					<span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu">
 					<li><a href="#modalWindow" data-backdrop="false" data-toggle="modal" onclick="createModalContent('relations');">Relations</a></li>
-					<li><a href="#">Processes</a></li>
+					<li><a href="#modalWindow" data-backdrop="false" data-toggle="modal" onclick="createModalContent('processes');">Processes</a></li>
+				</ul>
+			</div>
+			<div class="btn-group">
+				<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+					Tools
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a href="#">Analyze fake</a></li>
 				</ul>
 			</div>
 			<div class="btn-group">
@@ -198,14 +208,13 @@
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="$('#modalList').html('');">&times;</button>
 						<h4 class="modal-title" id = "modalTitle"></h4>
 					</div>
 					<div class="modal-body" id="modalList">
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-success" onclick="AddRelationRow('empty');">Add relation</button>
-						<button type="button" class="btn btn-info" onclick="saveRelations(); $('#modalWindow').modal('hide'); $('#modalList').html('');">Save & Close</button>
+						<button id="modalBtnAdd" type="button" class="btn btn-success">Add</button>
+						<button id="modalBtnSave" type="button" class="btn btn-info">Save & Close</button>
 						<button type="button" class="btn btn-warning" data-dismiss="modal" onclick="$('#modalList').html('');">Cancel</button>						
 					</div>
 				</div>
@@ -214,6 +223,21 @@
 			<!-- /.modal-dialog -->
 		</div>
 		<!-- /.modal -->
+		<div id="errorModal" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title" id = "errorModalTitle">An error occured</h4>
+					</div>
+					<div class="modal-body" id="errorModalBody">
+						
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-info" data-dismiss="modal">OK</button>					
+					</div>
+				</div>
+			</div>
+		</div>
 	</body>
 	<script type="text/javascript">
 		var mousePos;
@@ -385,6 +409,10 @@
 			$("#modalWindow").draggable({
 				handle: ".modal-header"
 			});
+			
+			$('#errorModal').on('hidden.bs.modal', function () {
+				$('#errorModalBody').html('');
+			});			
 		}
 		
 		window.onresize = function(){
@@ -1127,27 +1155,110 @@
 		}
 		
 		function createModalContent(type){
-			if (type = 'relations'){
+			if (type == 'relations'){
+				document.getElementById('modalBtnAdd').onclick = AddRelationRow;
+				document.getElementById('modalBtnSave').onclick = saveRelations;
 				$('#modalTitle').html('Relations');
 				getRelationsToShow().forEach(function (rel){
 					AddRelationRow(rel);
 				});				
 			}
+			if (type == 'processes'){
+				document.getElementById('modalBtnAdd').onclick = AddProcessRow;
+				document.getElementById('modalBtnSave').onclick = saveProcesses;
+				$('#modalTitle').html('Processes');
+				processes.forEach(function (proc){
+					AddProcessRow(proc);
+				});	
+			}
 		}	
+		
+		function AddProcessRow(proc){
+			var row;
+			if (proc == 'empty'){
+				row = getProcessModalRow('', '', '', '', '');
+			}else{
+				row = getProcessModalRow(proc.s, proc.action, proc.actionType, proc.actionDirection, proc.actionTarget);	
+			}
+			var list = document.getElementById('modalList');
+			row.id = 'modalProcessRow_' + list.children.length;
+			list.appendChild(row);
+		}
+		
+		/*
+			Process contains following fields:
+			s - subject that does something.
+			action - what subject does.
+			actionType - which type of action is occuring.
+			actionDirection - where goes the subject.
+			actionTarget - the target of the action (name of subject).
+		*/
+		function getProcessModalRow(s, a, t, d, at){
+			var col41 = document.createElement('div');
+			col41.className = "col-sm-3";			
+			col41.style = "padding: 1px;"
+			col41.appendChild(createCmb(getChildObjects(fCanvas), s));			
+			
+			var col42 = document.createElement('div');
+			col42.className = "col-sm-2";
+			col42.style = "padding: 1px;"
+			col42.appendChild(createAssociativeCmb(processActions, a));
+			
+			var col43 = document.createElement('div');
+			col43.className = "col-sm-2";
+			col43.style = "padding: 1px;"
+			col43.appendChild(createAssociativeCmb(processTypes, t));
+			
+			var col44 = document.createElement('div');
+			col44.className = "col-sm-2";
+			col44.style = "padding: 1px;"
+			col44.appendChild(createAssociativeCmb(processDirections, d));
+			
+			var col45 = document.createElement('div');
+			col45.className = "col-sm-2";
+			col45.style = "padding: 1px;"
+			col45.appendChild(createCmb(getChildObjects(fCanvas), at));
+			
+			var removeBtn = document.createElement('button');
+			removeBtn.type="button";
+			removeBtn.className="btn btn-danger";
+			removeBtn.innerHTML = '-';
+			removeBtn.style = "width: 100%;";
+			removeBtn.onclick = function(){
+				var row = this.parentNode.parentNode;
+				row.parentNode.removeChild(row);
+			}
+			
+			var col46 = document.createElement('div');
+			col46.className = "col-sm-1";
+			col46.style = "padding: 1px;"
+			col46.appendChild(removeBtn);
+			
+			var divRow = document.createElement('div');
+			divRow.className = "row";			
+			divRow.appendChild(col41);			
+			divRow.appendChild(col42);
+			divRow.appendChild(col43);
+			divRow.appendChild(col44);
+			divRow.appendChild(col45);	
+			divRow.appendChild(col46);			
+					
+			return divRow;
+		}
 		
 		function AddRelationRow(rel){
 			var row;
 			if (rel == 'empty'){
-				row = getRelationMadalRow('', '', '', '');
+				row = getRelationModalRow('', '', '', '');
 			}else{
-				row = getRelationMadalRow(rel.s1, rel.s2, rel.type, rel.property);	
+				row = getRelationModalRow(rel.s1, rel.s2, rel.type, rel.property);	
 			}
 			var list = document.getElementById('modalList');
 			row.id = 'modalRelationRow_' + list.children.length;
 			list.appendChild(row);
 		}
 		
-		function getRelationMadalRow(initS1, initS2, initType, initProp){
+		function getRelationModalRow(initS1, initS2, initType, initProp){
 			var col41 = document.createElement('div');
 			col41.className = "col-sm-3";			
 			col41.style = "padding: 1px;"
@@ -1251,12 +1362,48 @@
 		function saveRelations(){
 			var rows = $('#modalList').children();
 			relations = getNotEditableRelations();
+			var success = false;
 			for (var i = 0; i < rows.length; i++){
 				var newRelation = { s1: rows[i].childNodes[0].childNodes[0].value, s2: rows[i].childNodes[1].childNodes[0].value, type: rows[i].childNodes[2].childNodes[0].value, property: rows[i].childNodes[3].childNodes[0].value };
-				if (!createRelation(newRelation.s1, newRelation.s2, newRelation.type, newRelation.property)){
-					alert ('Line [' + i + ']: one or more of the values are empty or such relation is already exist');
-				}				
-			};
+				if (!createRelation(newRelation.s1, newRelation.s2, newRelation.type, newRelation.property)){		
+					//alert ('Line [' + i + ']: one or more of the values are empty or such relation is already exist');
+					$('#errorModalBody').append('<p>Line [' + (i+1) + ']: one or more of the values are empty or such relation is already exist</p>');
+					$('#errorModal').modal('show');
+					success = false;
+				}	
+				else{
+					success = true;
+				}			
+			}
+			if (success){
+				$('#modalWindow').modal('hide'); 
+				$('#modalList').html('');
+			}
+		}
+		
+		function saveProcesses(){
+			var rows = $('#modalList').children();
+			processes = [];
+			for (var i = 0; i < rows.length; i++){
+				var newProcess = { s: rows[i].childNodes[0].childNodes[0].value,
+					action: rows[i].childNodes[1].childNodes[0].value, 
+					actionType: rows[i].childNodes[2].childNodes[0].value, 
+					actionDirection: rows[i].childNodes[3].childNodes[0].value,
+					actionTarget: rows[i].childNodes[4].childNodes[0].value };
+				if (!createProcess(newProcess)){		
+					//alert ('Line [' + i + ']: one or more of the values are empty or such relation is already exist');
+					$('#errorModalBody').append('<p>Line [' + (i+1) + ']: one or more of the values are empty or such relation is already exist</p>');
+					$('#errorModal').modal('show');
+					success = false;
+				}	
+				else{
+					success = true;
+				}			
+			}
+			if (success){
+				$('#modalWindow').modal('hide'); 
+				$('#modalList').html('');
+			}
 		}
 	</script>
 </html>
