@@ -21,12 +21,17 @@ relationProperties['beside'] = 'beside';//'рядом';
     property - relations property.
 */
 function createRelation(s1,s2,type,property){
+    if (s1=='' || s2 == '' || type=='' || property == '' || 
+        s1=='empty' || s2 == 'empty' || type=='empty' || property == 'empty'){
+        return false;
+    }
     var  relation = {s1: s1, s2: s2, type: type, property: property};
     var check = findRelationByAllFields(relation.s1, relation.s2, relation.type, relation.property);
     if (check.length > 0){
-        return;
+        return false;
     }
     relations[relations.length] = relation;
+    return true;
 }
 
 /*
@@ -61,6 +66,12 @@ function findRelationByAllFields(s1,s2,t,p){
 function getRelationsToShow(){
     return relations.filter(function(rel){
         return !(rel.type == relationTypes["isLocated"] && rel.property == relationProperties["on"]); 
+    });
+}
+
+function getNotEditableRelations(){
+    return relations.filter(function(rel){
+        return (rel.type == relationTypes["isLocated"] && rel.property == relationProperties["on"]); 
     });
 }
 

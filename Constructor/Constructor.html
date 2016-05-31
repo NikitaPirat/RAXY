@@ -1173,8 +1173,8 @@
 			removeBtn.style = "width: 100%;";
 			removeBtn.onclick = function(){
 				var row = this.parentNode.parentNode;
-				var relationToRemove = findRelationByAllFields(row.children[0].value, row.children[1].value, row.children[2].value, row.children[3].value);
-				relations.splice(relations.indexOf(relationToRemove[0]), 1);
+				//var relationToRemove = findRelationByAllFields(row.children[0].value, row.children[1].value, row.children[2].value, row.children[3].value);
+				//relations.splice(relations.indexOf(relationToRemove[0]), 1);
 				row.parentNode.removeChild(row);
 			}
 			
@@ -1199,11 +1199,11 @@
 			var inpEl = document.createElement("select");
 			inpEl.className="js-example-basic-single js-states form-control select2-hidden-accessible";
 			inpEl.onchange = function (){
-				var row = this.parentNode.parentNode;
+				/*var row = this.parentNode.parentNode;
 				if (!replaceRelation( { s1: row.children[0].oldvalue, s2: row.children[1].oldvalue, type: row.children[2].oldvalue, property: row.children[3].oldvalue }, 
 								  { s1: row.children[0].value, s2: row.children[1].value, type: row.children[2].value, property: row.children[3].value } )){
 					alert ('This relation is already existing');
-				}
+				}*/
 			};
 			inpEl.onfocus = function(){
 				this.oldvalue = this.value;	
@@ -1253,8 +1253,15 @@
 		}
 		
 		function saveRelations(){
-			var rows = $('#modalList').find('select');
-			createRelation(rows[0].value, rows[1].value, rows[2].value, rows[3].value);
+			var rows = $('#modalList').children();
+			relations = getNotEditableRelations();
+			for (var i = 0; i < rows.length; i++){
+				var newRelation = { s1: rows[i].childNodes[0].childNodes[0].value, s2: rows[i].childNodes[1].childNodes[0].value, type: rows[i].childNodes[2].childNodes[0].value, property: rows[i].childNodes[3].childNodes[0].value };
+				if (!createRelation(newRelation.s1, newRelation.s2, newRelation.type, newRelation.property)){
+					alert ('Line [' + i + ']: one or more of the values are empty or such relation is already exist');
+				}				
+			};
+			//createRelation(rows[0].value, rows[1].value, rows[2].value, rows[3].value);
 		}
 	</script>
 </html>
